@@ -30,4 +30,3 @@ catkin build
 # source the workspace
 source ~/robothon2023/devel/setup.bash
 ```
-test
