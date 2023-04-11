@@ -1,4 +1,3 @@
-# !/home/liu/miniconda3/envs/dahengcamera/bin/python
 # coding=utf-8
 
 # 用户可自定义调用前缀,样例中使用了 gx
