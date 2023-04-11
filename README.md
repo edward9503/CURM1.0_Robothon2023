@@ -31,3 +31,20 @@ catkin build
 source ~/robothon2023/devel/setup.bash
 ```
 
+## Vision System
+
+### 1. Setup
+- A vision system consists of an rgbd camera and a rgb camera. Specifically, the RealSense D435i (depth ignored here), and a Daheng imaging device MER-031-860U3C
+are mounted above the table for localizing the board and perception the slider 
+indicator in screen respectively. Note that these two vision perception task are runned separately to ensure the real-time performance.
+
+### 2. Board Localization:
+- Online pose estimation (~45 fps+): we detect the center of red button/red port as the reference 
+to determine the board pose. Traditional computer vision techniques such as contour detection/morphological processing/
+color segmentation, etc. are utilized to achieve the robust and steady pose estimation.
+
+### 3. Screen Perception
+- Online visual perception (~50 fps+): we use the similar techniques above and focused on the accurate color segmenation. 
+Specifically, we first use the red color to localize the screen region and detect the four corners of the screen. Then we
+warped the screen region into the normal rectangular region. We further segment the relevant color such as red/yellow/cyan 
+and use the triangular fitting to find the peak position. 
