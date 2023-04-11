@@ -16,7 +16,7 @@ This is a repo of the vision component in Robothon 2023
     ```
 - ~~Install PyKDL on virtual environment from source (Ubuntu 1804), follow the~~ [instruction](https://blog.csdn.net/qq_42237662/article/details/109783935)
 
-   note: make sure to uninstall the ros-kdl packages in the system before install PyKDL. (**not required in Ubuntu2004**)
+   note: make sure to uninstall the ros-kdl packages in the system before install PyKDL. (**not required in Ubuntu 2004**)
    ```sh
    sudo find / -iname PyKDL.so # this will print out all paths to PyKDL.so
    sudo rm -rf <path to>/PyKDL.so
