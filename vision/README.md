@@ -35,6 +35,7 @@ This is a repo of the vision component in Robothon 2023
 
 - Board pose estimation:
   ```sh
+  roslaunch realsense2_camera rs_rgbd.launch
   python src/board_localization.py
   ```
   The board pose will be published in Rostopic@"/robothon2023/curm2023_vision/board_pose".
