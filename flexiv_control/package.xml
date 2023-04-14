@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>flexiv_control</name>
+  <version>0.6.0</version>
+  <description>Ros wrapper for the flexiv rdk</description>
+  <author email="wahrheitwsz@gmail.com">Shengzhi Wang</author>
+  <maintainer email="wahrheitwsz@gmail.com">Shengzhi Wang</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>urdf</build_depend>
+  <!-- <build_depend>flexiv_msgs</build_depend> -->
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <!-- <exec_depend>flexiv_msgs</exec_depend> -->
+
+</package>
