@@ -1,3 +1,12 @@
 [submodule "flexiv_ros"]
 	path = flexiv_ros
 	url = https://github.com/flexivrobotics/flexiv_ros.git
+[submodule "flexbe_behavior_engine"]
+	path = flexbe_behavior_engine
+	url = https://github.com/team-vigir/flexbe_behavior_engine.git
+[submodule "flexbe_app"]
+	path = flexbe_app
+	url = https://github.com/FlexBE/flexbe_app.git
+[submodule "generic_flexbe_states"]
+	path = generic_flexbe_states
+	url = https://github.com/FlexBE/generic_flexbe_states.git
