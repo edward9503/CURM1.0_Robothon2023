@@ -49,11 +49,27 @@ target_link_libraries(flexiv_task_ready_position
   ${catkin_LIBRARIES}
 )
 
+add_executable(flexiv_control_loop
+  src/flexiv_control_loop.cpp
+)
+target_include_directories(
+  flexiv_control_loop
+  PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/rdk/include
+  ${catkin_INCLUDE_DIRS}
+)
+target_link_libraries(flexiv_control_loop
+  PRIVATE
+  FlexivRdk
+  ${catkin_LIBRARIES}
+)
+
 # INSTALL
 # Install executable
 install(
   TARGETS
-    flexiv_task_ready_position
+    flexiv_control_loop
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
