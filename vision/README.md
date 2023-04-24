@@ -4,7 +4,7 @@ This is a repo of the vision component in Robothon 2023
 ## Install
 
 - Install [realsense API](https://github.com/IntelRealSense/librealsense)
-- Install ROS Wrapper (w/ 3rd party [ddynamic_reconfigure](ddynamic_reconfigure))
+- Install ROS Wrapper (w/ 3rd party [ddynamic_reconfigure](https://github.com/ros/dynamic_reconfigure))
   ```sh
     mkdir -p ~/realsense_ws/src
     cd ~/realsense_ws/src/
