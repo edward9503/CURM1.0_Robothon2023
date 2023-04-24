@@ -7,3 +7,7 @@
 [submodule "generic_flexbe_states"]
 	path = generic_flexbe_states
 	url = https://github.com/FlexBE/generic_flexbe_states.git
+[submodule "calibration/easy_aruco"]
+	url = https://github.com/marcoesposito1988/easy_aruco.git
+[submodule "calibration/easy_handeye"]
+	url = https://github.com/IFL-CAMP/easy_handeye.git
