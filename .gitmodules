@@ -11,3 +11,5 @@
 	url = https://github.com/marcoesposito1988/easy_aruco.git
 [submodule "calibration/easy_handeye"]
 	url = https://github.com/IFL-CAMP/easy_handeye.git
+[submodule "calibration/flexiv_ros"]
+	url = https://github.com/linhongbin-ws/flexiv_ros
