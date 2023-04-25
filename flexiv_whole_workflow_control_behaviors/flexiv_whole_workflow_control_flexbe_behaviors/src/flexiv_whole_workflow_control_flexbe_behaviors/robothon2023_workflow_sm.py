@@ -8,10 +8,12 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
+from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state import ArmCartesianControlState
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
+from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
-
+import numpy as np
 # [/MANUAL_IMPORT]
 
 
@@ -43,8 +45,15 @@ class robothon2023_workflowSM(Behavior):
 
 
 	def create(self):
-		# x:89 y:340, x:496 y:359
+		# x:141 y:560, x:496 y:359
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
+		_state_machine.userdata.probe_grasping_point_pose = np.identity(4)
+		_state_machine.userdata.rotary_door_grasping_point_pose = np.identity(4)
+		_state_machine.userdata.black_hole_pose = np.identity(4)
+		_state_machine.userdata.red_hole_pose = np.identity(4)
+		_state_machine.userdata.slider_pose = np.identity(4)
+		_state_machine.userdata.red_button_pose = np.identity(4)
+		_state_machine.userdata.blue_button_pose = np.identity(4)
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -53,19 +62,33 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:208 y:40
+			# x:577 y:69
+			OperatableStateMachine.add('calculate_task_pose_state',
+										CalculateTaskPoseState(),
+										transitions={'done': 'joint_cmd_1', 'failed': 'calculate_task_pose_state'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
+
+			# x:628 y:208
 			OperatableStateMachine.add('joint_cmd_1',
 										ArmJointControlState(input_cmd="MoveJ(target=-98.75 -16.01 9.44 124.92 -2.56 47.66 49.25)", blocking=True, clear=False),
-										transitions={'done': 'joint_cmd_2', 'failed': 'failed'},
+										transitions={'done': 'joint_cmd_2', 'failed': 'joint_cmd_1'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'message': 'message'})
 
-			# x:36 y:133
+			# x:72 y:178
 			OperatableStateMachine.add('joint_cmd_2',
 										ArmJointControlState(input_cmd="MoveJ(target=-98.75 -16.01 9.44 104.92 -2.56 47.66 49.25)", blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'failed'},
+										transitions={'done': 'Test_cartesian', 'failed': 'joint_cmd_2'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'message': 'message'})
+
+			# x:206 y:416
+			OperatableStateMachine.add('Test_cartesian',
+										ArmCartesianControlState(task='red_hole', blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Test_cartesian'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
 
 
 		return _state_machine
