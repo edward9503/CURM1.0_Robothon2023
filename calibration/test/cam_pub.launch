@@ -1,0 +1,9 @@
+<launch>
+  <!-- (start your robot's MoveIt! stack, e.g. include its moveit_planning_execution.launch) -->
+  <!-- (start your tracking system's ROS driver) -->
+
+  <include file="$(find easy_handeye)/launch/publish.launch">
+    <arg name="namespace_prefix" value="flexiv_realsense_handeyecalibration"/> <!-- use the same namespace that you used during calibration! -->
+    <arg name="eye_on_hand" value="false" />
+  </include>
+</launch>
