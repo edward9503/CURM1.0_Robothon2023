@@ -47,13 +47,14 @@ class robothon2023_workflowSM(Behavior):
 	def create(self):
 		# x:141 y:560, x:548 y:569
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
-		_state_machine.userdata.probe_grasping_point_pose = np.identity(4)
-		_state_machine.userdata.rotary_door_grasping_point_pose = np.identity(4)
-		_state_machine.userdata.black_hole_pose = np.identity(4)
-		_state_machine.userdata.red_hole_pose = np.identity(4)
-		_state_machine.userdata.slider_pose = np.identity(4)
-		_state_machine.userdata.red_button_pose = np.array([[1, 0, 0, -0.0513], [0, 1, 0, -0.006], [0, 0, 1, 0.093], [0, 0, 0, 1]])
-		_state_machine.userdata.blue_button_pose = np.array([[1, 0, 0, -0.0487], [0, 1, 0, 0.0098], [0, 0, 1, 0.0928], [0, 0, 0, 1]])
+		_state_machine.userdata.probe_grasping_point_pose = None
+		_state_machine.userdata.rotary_door_grasping_point_pose = None
+		_state_machine.userdata.black_hole_pose = None
+		_state_machine.userdata.red_hole_pose = None
+		_state_machine.userdata.slider_pose = None
+		_state_machine.userdata.red_button_pose = None
+		_state_machine.userdata.blue_button_pose = None
+		_state_machine.userdata.T_RobB_BoxB = None
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -65,9 +66,9 @@ class robothon2023_workflowSM(Behavior):
 			# x:577 y:69
 			OperatableStateMachine.add('calculate_task_pose_state',
 										CalculateTaskPoseState(),
-										transitions={'done': 'joint_to_task_ready_position', 'failed': 'calculate_task_pose_state'},
+										transitions={'done': 'finished', 'failed': 'calculate_task_pose_state'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
 			# x:632 y:358
 			OperatableStateMachine.add('go_above_blue_button',
