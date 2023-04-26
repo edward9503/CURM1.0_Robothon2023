@@ -22,6 +22,8 @@ class ArmCartesianControlState(EventState):
 	This state is used to set the desired joint angles for the flexiv robot arm
 
     -- task 								string		The name of the task to be executed.
+    -- z_offset 							float		The vertical offset for the ee position above the task position.
+														Can be used to move the ee to a task-ready position.
     -- blocking 							bool 		Blocks until a message is received.
     -- clear 								bool 		Drops last message on this topic on enter
                     						            in order to only handle message received since this state is active.
@@ -36,7 +38,7 @@ class ArmCartesianControlState(EventState):
     <= failed 											Task is failed.
     '''
 
-	def __init__(self, task, blocking=True, clear=False):
+	def __init__(self, task, z_offset=0.0, blocking=True, clear=False):
 		super(ArmCartesianControlState, self).__init__(outcomes=['done', 'failed'],
                                               		   input_keys=['red_button_pose', 'blue_button_pose', 
 							   							   		   'slider_pose', 'red_hole_pose', 
@@ -45,6 +47,7 @@ class ArmCartesianControlState(EventState):
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
 		self._task = task
+		self._z_offset = z_offset
 		self._blocking = blocking
 		self._clear = clear
 		self._connected = False
@@ -116,7 +119,7 @@ class ArmCartesianControlState(EventState):
 	def _arraryCmd_to_string(self, target_pose):
 		r = R.from_matrix(target_pose[0:3, 0:3])
 		target_zyx_angle = r.as_euler('zyx', True).tolist()
-		target_position = [target_pose[0, 3], target_pose[1, 3], target_pose[2, 3]]
+		target_position = [target_pose[0, 3], target_pose[1, 3], target_pose[2, 3] + self._z_offset]
 		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.3)"
 		return cmd_string
 

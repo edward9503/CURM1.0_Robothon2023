@@ -85,7 +85,7 @@ class robothon2023_workflowSM(Behavior):
 
 			# x:206 y:416
 			OperatableStateMachine.add('Test_cartesian',
-										ArmCartesianControlState(task='red_hole', blocking=True, clear=False),
+										ArmCartesianControlState(task='red_hole', z_offset=1.0, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'Test_cartesian'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
