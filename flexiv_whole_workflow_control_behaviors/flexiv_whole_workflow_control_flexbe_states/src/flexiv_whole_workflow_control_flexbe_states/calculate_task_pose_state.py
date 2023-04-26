@@ -55,13 +55,13 @@ class CalculateTaskPoseState(EventState):
 
 	def execute(self, userdata):
 		if not self._connected:
-			userdata.red_button_pose = None
-			userdata.blue_button_pose = None
-			userdata.slider_pose = None
-			userdata.red_hole_pose = None
-			userdata.black_hole_pose = None
-			userdata.rotary_door_grasping_point_pose = None
-			userdata.probe_grasping_point_pose = None
+			# userdata.red_button_pose = None
+			# userdata.blue_button_pose = None
+			# userdata.slider_pose = None
+			# userdata.red_hole_pose = None
+			# userdata.black_hole_pose = None
+			# userdata.rotary_door_grasping_point_pose = None
+			# userdata.probe_grasping_point_pose = None
 			return 'failed'
 
 		if self._sub.has_msg(self._board_pose_topic):
