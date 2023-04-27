@@ -72,8 +72,8 @@ class robothon2023_workflowSM(Behavior):
 
 			# x:632 y:358
 			OperatableStateMachine.add('go_above_blue_button',
-										ArmCartesianControlState(task='blue_button', z_offset=0.3, blocking=True, clear=False),
-										transitions={'done': 'press_blue_button', 'failed': 'go_above_blue_button'},
+										ArmCartesianControlState(task='blue_button', z_offset=0.05, blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'go_above_blue_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
 

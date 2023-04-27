@@ -74,26 +74,61 @@ class CalculateTaskPoseState(EventState):
 			with open("/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml", "r") as stream:
 				try:
 					_obj = yaml.safe_load(stream)['transformation']
-					pose_list = [_obj['x'],_obj['y'],_obj['z'],_obj['qx'],_obj['qy'],_obj['qz'],_obj['qw']]
+					pose_list = [_obj['x'],_obj['y'],_obj['z'], _obj['qx'],_obj['qy'],_obj['qz'],_obj['qw']]
 					T_RobB_CamB = self._Quaternion2T(*pose_list)
 
 					_pose = self._sub.get_last_msg(self._board_pose_topic)
 					# if _pose is None:
 					# 	Logger.loginfo("xxxx")
 					# 	return 'failed'
+					_pose.pose.position.x = _pose.pose.position.x/1000
+					_pose.pose.position.y = _pose.pose.position.y/1000
+					_pose.pose.position.z = _pose.pose.position.z/1000  
 					T_CamB_BoxB = self._PoseStamped2T(_pose)
 					userdata.T_RobB_BoxB = T_RobB_CamB * T_CamB_BoxB
 				except yaml.YAMLError as exc:
 					return 'failed'
 			Logger.loginfo('All poses are obtained. Start the whole tasks.')
+
 			# The followings are only for testing at the current stage
-			userdata.red_button_pose = self._red_button_pose_local
-			userdata.blue_button_pose = self._blue_button_pose_local
-			userdata.slider_pose = self._slider_pose_local
-			userdata.red_hole_pose = self._red_hole_pose_local
-			userdata.black_hole_pose = self._black_hole_pose_local
-			userdata.rotary_door_grasping_point_pose = self._rotary_door_grasping_point_pose_local
-			userdata.probe_grasping_point_pose = self._probe_grasping_point_pose_local
+			userdata.red_button_pose = userdata.T_RobB_BoxB * self._red_button_pose_local
+			userdata.blue_button_pose = userdata.T_RobB_BoxB * self._blue_button_pose_local
+			userdata.slider_pose = userdata.T_RobB_BoxB * self._slider_pose_local
+			userdata.red_hole_pose = userdata.T_RobB_BoxB * self._red_hole_pose_local
+			userdata.black_hole_pose = userdata.T_RobB_BoxB * self._black_hole_pose_local
+			userdata.rotary_door_grasping_point_pose = userdata.T_RobB_BoxB * self._rotary_door_grasping_point_pose_local
+			userdata.probe_grasping_point_pose = userdata.T_RobB_BoxB * self._probe_grasping_point_pose_local
+
+			_T = userdata.T_RobB_BoxB
+			Logger.loginfo("box base w.r.t. robot base: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(_T.p.x(),_T.p.y(),_T.p.z(),
+																									np.rad2deg(list(_T.M.GetRPY())[0]),
+																									np.rad2deg(list(_T.M.GetRPY())[1]),
+																									np.rad2deg(list(_T.M.GetRPY())[2]),
+																									))
+			_T = userdata.blue_button_pose
+			Logger.loginfo("blue w.r.t. robot base: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(_T.p.x(),_T.p.y(),_T.p.z(),
+																									np.rad2deg(list(_T.M.GetRPY())[0]),
+																									np.rad2deg(list(_T.M.GetRPY())[1]),
+																									np.rad2deg(list(_T.M.GetRPY())[2]),
+																									))
+			_T = userdata.red_hole_pose
+			Logger.loginfo("red hole w.r.t. robot base: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(_T.p.x(),_T.p.y(),_T.p.z(),
+																									np.rad2deg(list(_T.M.GetRPY())[0]),
+																									np.rad2deg(list(_T.M.GetRPY())[1]),
+																									np.rad2deg(list(_T.M.GetRPY())[2]),
+																									))
+			_T = userdata.black_hole_pose
+			Logger.loginfo("black hole w.r.t. robot base: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(_T.p.x(),_T.p.y(),_T.p.z(),
+																									np.rad2deg(list(_T.M.GetRPY())[0]),
+																									np.rad2deg(list(_T.M.GetRPY())[1]),
+																									np.rad2deg(list(_T.M.GetRPY())[2]),
+																									))
+			_T = T_CamB_BoxB
+			Logger.loginfo("box base w.r.t. cam base: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(_T.p.x(),_T.p.y(),_T.p.z(),
+																									np.rad2deg(list(_T.M.GetRPY())[0]),
+																									np.rad2deg(list(_T.M.GetRPY())[1]),
+																									np.rad2deg(list(_T.M.GetRPY())[2]),
+																									))
 			return 'done'
 
 	def on_enter(self, userdata):

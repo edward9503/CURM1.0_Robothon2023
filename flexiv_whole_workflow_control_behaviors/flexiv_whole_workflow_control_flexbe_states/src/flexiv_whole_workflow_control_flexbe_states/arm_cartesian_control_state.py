@@ -116,10 +116,9 @@ class ArmCartesianControlState(EventState):
 			return True
 		return False
 	
-	def _arraryCmd_to_string(self, target_pose):
-		r = R.from_matrix(target_pose[0:3, 0:3])
-		target_zyx_angle = r.as_euler('zyx', True).tolist()
-		target_position = [target_pose[0, 3], target_pose[1, 3], target_pose[2, 3] + self._z_offset]
+	def _arraryCmd_to_string(self, T):
+		target_zyx_angle = list(T.M.GetEulerZYX())
+		target_position = [T.p.x(), T.p.y(), T.p.z() + self._z_offset]
 		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.3)"
 		return cmd_string
 
