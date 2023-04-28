@@ -26,45 +26,58 @@ class ArmJointControlState(EventState):
     '''
 
 	def __init__(self, q1,q2,q3,q4,q5,q6,q7, 
-	max_cartesian_vel=0.2, blocking=True, clear=False):
-		super(ArmJointControlState, self).__init__(outcomes=['done', 'failed'],
-                                              output_keys=['message'])
-		self._arm_status_topic = '/arm_task_status'
-		self._arm_cmd_topic = '/arm_primitive_cmd'
+			max_cartesian_vel=0.2, 
+			blocking=True, 
+			clear=False,
+			arm_status_topic = '/arm_task_status',
+			arm_cmd_topic = '/arm_primitive_cmd'):
+		super(ArmJointControlState, self).__init__(outcomes=['done', 'failed'])
+		self._arm_status_topic = arm_status_topic
+		self._arm_cmd_topic = arm_cmd_topic
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
 		# self._input_cmd = input_cmd
 		self._qs = [q1,q2,q3,q4,q5,q6,q7,]
 		self._max_cartesian_vel= max_cartesian_vel
 		self._blocking = blocking
 		self._clear = clear
+
+		# variables
 		self._connected = False
 
-		if not self._connect():
-			Logger.logwarn('Topic %s for state %s not yet available.\n'
-                           'Will try again when entering the state...' % (self._arm_status_topic, self.name))
+		self._connect()
+			
+			# Logger.logwarn('Topic %s for state %s not yet available.\n'
+            #                'Will try again when entering the state...' % (self._arm_status_topic, self.name))
 
 	def execute(self, userdata):
-		if not self._connected:
-			userdata.message = None
-			return 'failed'
+		if self.userdata.is_sim:
+			self._connected = True
+			
+		else:
+			if not self._connected:
+				userdata.message = None
+				return 'failed'
 
-		if self._sub.has_msg(self._arm_status_topic) or not self._blocking:
-            # userdata.message = self._sub.get_last_msg(self._arm_status_topic)
-			if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
-				self._sub.remove_last_msg(self._arm_status_topic)
-				sleep(1.0)    
-				Logger.loginfo('[Sucess]: MoveJ')      
-				return 'done'
+			if self._sub.has_msg(self._arm_status_topic) or not self._blocking:
+				# userdata.message = self._sub.get_last_msg(self._arm_status_topic)
+				if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
+					self._sub.remove_last_msg(self._arm_status_topic)
+					sleep(1.0)    
+					Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join(self._qs)))      
+					return 'done'
 
 	def on_enter(self, userdata):
-		if not self._connected:
-			if self._connect():
-				Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._arm_status_topic)
-			else:
-				Logger.logwarn('Topic %s still not available, giving up.' % self._arm_status_topic)
+		if self.userdata.is_sim:
+			self._connected = True
+		else:
+			if not self._connected:
+				if self._connect():
+					Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._arm_status_topic)
+				else:
+					Logger.logwarn('Topic %s still not available, giving up.' % self._arm_status_topic)
 
-		if self._connected and self._clear and self._sub.has_msg(self._arm_status_topic):
-			self._sub.remove_last_msg(self._arm_status_topic)
+			if self._connected and self._clear and self._sub.has_msg(self._arm_status_topic):
+				self._sub.remove_last_msg(self._arm_status_topic)
 
 		# publish user input command
 		input_cmd_msg = String()
@@ -78,6 +91,8 @@ class ArmJointControlState(EventState):
 			self._sub = ProxySubscriberCached({self._arm_status_topic: msg_type})
 			self._connected = True
 			return True
+			
+		Logger.logwarn("fail to connect ros topic {}".format(self._arm_status_topic))
 		return False
 
 	def _Quaternion2T(self, x,y, z, rx, ry, rz, rw):
@@ -96,13 +111,13 @@ class ArmJointControlState(EventState):
 		T = self._Quaternion2T(x, y, z, Qx,Qy,Qz,Qw)
 		return T
 
-	def _RPY2T(self, x,y, z, R, P, Y):
-		return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
+	# def _RPY2T(self, x,y, z, R, P, Y):
+	# 	return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
 
-	def _T2RPY(self, T: Frame):
-		pos = [T.p.x(),T.p.y(),T.p.z()]
-		rpy = list(T.M.GetRPY())
-		return np.array(pos), np.array(rpy)
+	# def _T2RPY(self, T: Frame):
+	# 	pos = [T.p.x(),T.p.y(),T.p.z()]
+	# 	rpy = list(T.M.GetRPY())
+	# 	return np.array(pos), np.array(rpy)
 
 
 # "MoveJ(target=-98.75 -16.01 9.44 124.92 -2.56 47.66 49.25)"
