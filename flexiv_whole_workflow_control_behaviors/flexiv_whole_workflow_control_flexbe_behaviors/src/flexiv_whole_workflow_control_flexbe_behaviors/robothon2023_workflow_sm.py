@@ -64,39 +64,21 @@ class robothon2023_workflowSM(Behavior):
 		
 		# [/MANUAL_CREATE]
 
-		# x:768 y:451, x:130 y:365
-		_sm_1-press_start_button_0 = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['blue_button_pose', 'is_sim', 'is_debug'])
-
-		with _sm_1-press_start_button_0:
-			# x:95 y:168
-			OperatableStateMachine.add('hover to blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
-										transitions={'done': 'move to blue button', 'failed': 'failed'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
-
-			# x:394 y:164
-			OperatableStateMachine.add('move to blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'failed'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
-
-
 
 		with _state_machine:
 			# x:577 y:69
 			OperatableStateMachine.add('Calibrate Board Location',
-										CalculateTaskPoseState(rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml"red_button_pose_local, red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0], board_pose_topic="/robothon2023/curm2023_vision/board_pose"),
-										transitions={'done': 'Move Joint to Ready Pose', 'failed': 'Calibrate Board Location'},
+										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
+										transitions={'done': 'finished', 'failed': 'Calibrate Board Location'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
 
 			# x:608 y:163
-			OperatableStateMachine.add('Move Joint to Ready Pose',
-										ArmJointControlState(q1=-98.75, q2=-16.01, q3=9.44, q4=124.92, q5=-2.56, q6=47.66, q7=49.25, max_cartesian_vel=0.2, blocking=True, clear=False, arm_status_topic='/arm_task_status', arm_cmd_topic='/arm_primitive_cmd'),
-										transitions={'done': '1-Press Start Button', 'failed': 'Move Joint to Ready Pose'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off})
+			OperatableStateMachine.add('Move_Joint',
+										ArmJointControlState(q1=-98.75, q2=-16.01, q3=9.44, q4=124.92, q5=-2.56, q6=47.66, q7=49.25, max_cartesian_vel=0.2, blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Move_Joint'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:166 y:161
 			OperatableStateMachine.add('Test_slider',
@@ -132,13 +114,6 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'done': 'finished', 'failed': 'press_red_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
-
-			# x:1009 y:188
-			OperatableStateMachine.add('1-Press Start Button',
-										_sm_1-press_start_button_0,
-										transitions={'finished': 'finished', 'failed': '1-Press Start Button'},
-										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'blue_button_pose': 'blue_button_pose', 'is_sim': 'is_sim', 'is_debug': 'is_debug'})
 
 
 		return _state_machine

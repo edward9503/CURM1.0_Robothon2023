@@ -21,7 +21,7 @@ import yaml
 
 class CalculateTaskPoseState(EventState):
 	'''
-	This state is used to set the desired joint angles for the flexiv robot arm
+	This state to track all key poses on box
 
     #> red_button_pose						T		red button pose w.r.t. robot base
     #> blue_button_pose						T		blue button pose w.r.t. robot base
@@ -37,23 +37,23 @@ class CalculateTaskPoseState(EventState):
     '''
 
 	def __init__(self,
-					rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml",
 					red_button_pose_local = [0,0,0,0,0,0],
 					blue_button_pose_local = [0.0136,0,0, 0,0,0],   
 					slider_pose_local = [-0.0827,0.0348,0, 0,0,0], 
 					red_hole_pose_local = [-0.0113,0.0584,0, 0,0,0], 
 					black_hole_pose_local =[0.0136,0.0583,0, 0,0,0], 
 					rotary_door_grasping_point_pose_local = [0.0067,0.1468,0, 0,0,0], 
-					probe_grasping_point_pose_local = [0,0.2047,0, 0,0,0], 
-					board_pose_topic="/robothon2023/curm2023_vision/board_pose"):
+					probe_grasping_point_pose_local = [0,0.2047,0, 0,0,0]
+					):
 
 		super(CalculateTaskPoseState, self).__init__(
 					outcomes=['done', 'failed'],
 					output_keys=['red_button_pose', 'blue_button_pose', 
 								'slider_pose', 'red_hole_pose', 
 								'black_hole_pose', 'rotary_door_grasping_point_pose', 
-								'probe_grasping_point_pose','box_base_pose'],)
-
+								'probe_grasping_point_pose','box_base_pose'])
+		board_pose_topic="/robothon2023/curm2023_vision/board_pose"
+		rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml",
 		self._board_pose_topic = board_pose_topic
 		self._red_button_pose_local = self._ZYX2T(*red_button_pose_local) 
 		self._blue_button_pose_local =self._ZYX2T(*blue_button_pose_local) 
@@ -175,8 +175,8 @@ class CalculateTaskPoseState(EventState):
 	# 	rpy = list(T.M.GetRPY())
 	# 	return np.array(pos), np.array(rpy)
 	def _ZYX2T(self,x,y,z, Rx, Ry, Rz):
+		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))
+	def _T2ZYX(self,x,y,z, Rx, Ry, Rz):
 		pos = [T.p.x(),T.p.y(),T.p.z()]
 		rpy = list(T.M.GetZYX())
 		return np.array(pos), np.array(rpy)
-	def _T2ZYX(self,x,y,z, Rx, Ry, Rz):
-		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))

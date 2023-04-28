@@ -14,7 +14,7 @@ from time import sleep
 
 class ArmJointControlState(EventState):
 	'''
-	This state is used to set the desired joint angles for the flexiv robot arm
+	State to use primitive MoveJ in Flexiv
 
     -- input_cmd 	string		The joint command for the robot arm.
     -- blocking 	bool 		Blocks until a message is received.
@@ -28,10 +28,11 @@ class ArmJointControlState(EventState):
 	def __init__(self, q1,q2,q3,q4,q5,q6,q7, 
 			max_cartesian_vel=0.2, 
 			blocking=True, 
-			clear=False,
-			arm_status_topic = '/arm_task_status',
-			arm_cmd_topic = '/arm_primitive_cmd'):
-		super(ArmJointControlState, self).__init__(outcomes=['done', 'failed'])
+			clear=False):
+		super(ArmJointControlState, self).__init__(input_keys=['is_debug','is_sim'],
+			outcomes=['done', 'failed'])
+		arm_status_topic = '/arm_task_status',
+		arm_cmd_topic = '/arm_primitive_cmd'
 		self._arm_status_topic = arm_status_topic
 		self._arm_cmd_topic = arm_cmd_topic
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
@@ -44,7 +45,7 @@ class ArmJointControlState(EventState):
 		# variables
 		self._connected = False
 
-		self._connect()
+
 			
 			# Logger.logwarn('Topic %s for state %s not yet available.\n'
             #                'Will try again when entering the state...' % (self._arm_status_topic, self.name))
@@ -52,7 +53,8 @@ class ArmJointControlState(EventState):
 	def execute(self, userdata):
 		if self.userdata.is_sim:
 			self._connected = True
-			
+			Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join(self._qs)))
+			return 'done'   
 		else:
 			if not self._connected:
 				userdata.message = None
@@ -111,14 +113,4 @@ class ArmJointControlState(EventState):
 		T = self._Quaternion2T(x, y, z, Qx,Qy,Qz,Qw)
 		return T
 
-	# def _RPY2T(self, x,y, z, R, P, Y):
-	# 	return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
-
-	# def _T2RPY(self, T: Frame):
-	# 	pos = [T.p.x(),T.p.y(),T.p.z()]
-	# 	rpy = list(T.M.GetRPY())
-	# 	return np.array(pos), np.array(rpy)
-
-
-# "MoveJ(target=-98.75 -16.01 9.44 124.92 -2.56 47.66 49.25)"
 		

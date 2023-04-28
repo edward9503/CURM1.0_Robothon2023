@@ -20,7 +20,7 @@ from time import sleep
 
 class ArmCartesianControlState(EventState):
 	'''
-	This state is used to set the desired joint angles for the flexiv robot arm
+	State to use primitive MoveL in Flexiv
 
     -- offset_x 							float		offset x coordinate w.r.t. robot base
 	-- offset_y 							float		offset y coordinate w.r.t. robot base
@@ -152,11 +152,11 @@ class ArmCartesianControlState(EventState):
 		return T
 
 	def _ZYX2T(self,x,y,z, Rx, Ry, Rz):
+		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))
+	def _T2ZYX(self,x,y,z, Rx, Ry, Rz):
 		pos = [T.p.x(),T.p.y(),T.p.z()]
 		rpy = list(T.M.GetZYX())
 		return np.array(pos), np.array(rpy)
-	def _T2ZYX(self,x,y,z, Rx, Ry, Rz):
-		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))
 
 	# def _RPY2T(self, x,y, z, R, P, Y):
 	# 	return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
