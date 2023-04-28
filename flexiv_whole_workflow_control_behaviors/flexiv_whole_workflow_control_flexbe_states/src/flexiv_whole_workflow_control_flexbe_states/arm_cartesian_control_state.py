@@ -21,7 +21,7 @@ class ArmCartesianControlState(EventState):
 	'''
 	This state is used to set the desired joint angles for the flexiv robot arm
 
-    -- task 								string		The name of the task to be executed.
+    -- task 								string		The name of task type, value: 'red_button','blue_button', 'slider', 'red_hole','black_hole','rotary_door','probe','move' 
     -- offset_x 							float		offset x coordinate w.r.t. robot base
 	-- offset_y 							float		offset y coordinate w.r.t. robot base
 	-- offset_z 							float		offset z coordinate w.r.t. robot base
@@ -184,3 +184,21 @@ class ArmCartesianControlState(EventState):
 		pos = [T.p.x(),T.p.y(),T.p.z()]
 		rpy = list(T.M.GetRPY())
 		return np.array(pos), np.array(rpy)
+
+
+			if self._task == 'red_button':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
+			elif self._task == 'blue_button':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
+			elif self._task == 'slider':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
+			elif self._task == 'red_hole':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
+			elif self._task == 'black_hole':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
+			elif self._task == 'rotary_door':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
+			elif self._task == 'probe':
+				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
+			elif self._task == 'move':
+
