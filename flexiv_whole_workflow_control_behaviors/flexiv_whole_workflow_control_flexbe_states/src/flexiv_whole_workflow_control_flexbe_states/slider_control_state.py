@@ -71,7 +71,34 @@ class SliderControlState(EventState):
 		   					   'Please move the camera or board...')
 				return 'failed'
 			else:
-				slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] * scale_factor, 0, 0)
+				while (self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] != 4040.0 and 
+	   				   self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] == 4040.0):
+					slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] * scale_factor, 0, 0)
+					slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
+					self._current_ee_position += slide_error_global
+					input_cmd_msg = String()
+					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
+					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
+						rospy.loginfo('I am doing')
+						continue
+					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
+				if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
+					self._current_task_nr += 1
+					Logger.loginfo('Successfully finished the first matching task.')
+				else:
+					Logger.loginfo('Viewed is blocked. Going back to home position.')
+					input_cmd_msg = String()
+					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, userdata.slider_pose.p))
+					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
+						rospy.loginfo('I am doing')
+						continue
+					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
+					return 'failed'
+		else:
+			while self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
+				slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] * scale_factor, 0, 0)
 				slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
 				self._current_ee_position += slide_error_global
 				input_cmd_msg = String()
@@ -81,39 +108,8 @@ class SliderControlState(EventState):
 					rospy.loginfo('I am doing')
 					continue
 				self._arm_status_sub.remove_last_msg(self._arm_status_topic)
-
-
-		
-		if not self._cmd_published:
-			input_cmd_msg = String()
-			if self._task == 'red_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
-			elif self._task == 'blue_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
-			elif self._task == 'slider':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
-			elif self._task == 'red_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
-			elif self._task == 'black_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
-			elif self._task == 'rotary_door':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
-			elif self._task == 'probe':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
-			else:
-				Logger.logwarn('None task can be detected.\n'
-		   					   'Please stop the whole process and edit your task name again...')
-				return 'failed'
-				
-			self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
-			self._cmd_published = True
-
-		if self._arm_status_sub.has_msg(self._arm_status_topic) or not self._blocking:
-			if self._arm_status_sub.get_last_msg(self._arm_status_topic).data == "Done.":
-				self._arm_status_sub.remove_last_msg(self._arm_status_topic)
-				sleep(1.0)    
-				Logger.loginfo('Successfully finished task.')      
-				return 'done'
+			Logger.loginfo('Successfully finished the second matching task.')
+			return 'done'
 
 	def on_enter(self, userdata):
 		if not self._connected:
