@@ -55,6 +55,7 @@ class SliderControlState(EventState):
 		self._clear = clear
 		self._connected = False
 		self._cmd_published = False
+		self._scale_factor = 0.000076755
 		self._current_task_nr = 1
 
 		if not self._connect():
@@ -73,14 +74,15 @@ class SliderControlState(EventState):
 			else:
 				while (self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] != 4040.0 and 
 	   				   self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] == 4040.0):
-					slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] * scale_factor, 0, 0)
+					slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] * self._scale_factor, 0, 0)
 					slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
 					self._current_ee_position += slide_error_global
 					input_cmd_msg = String()
 					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
 					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
-						rospy.loginfo('I am doing')
+						rospy.loginfo('I am doing1')
+						rospy.loginfo(slide_error_global)
 						continue
 					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
 				if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
@@ -92,20 +94,21 @@ class SliderControlState(EventState):
 					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, userdata.slider_pose.p))
 					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
-						rospy.loginfo('I am doing')
+						rospy.loginfo('I am doing blocked')
 						continue
 					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
 					return 'failed'
 		else:
 			while self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
-				slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] * scale_factor, 0, 0)
+				slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] * self._scale_factor, 0, 0)
 				slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
 				self._current_ee_position += slide_error_global
 				input_cmd_msg = String()
 				input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
 				self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 				while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
-					rospy.loginfo('I am doing')
+					rospy.loginfo('I am doing3')
+					rospy.loginfo(slide_error_global)
 					continue
 				self._arm_status_sub.remove_last_msg(self._arm_status_topic)
 			Logger.loginfo('Successfully finished the second matching task.')
@@ -121,7 +124,7 @@ class SliderControlState(EventState):
 		if self._connected and self._clear and self._arm_status_sub.has_msg(self._arm_status_topic):
 			self._arm_status_sub.remove_last_msg(self._arm_status_topic)
 
-		self._current_ee_position = userdata.slider_pose
+		self._current_ee_position = userdata.slider_pose.p
 
 		# publish user input command
 		# input_cmd_msg = String()
