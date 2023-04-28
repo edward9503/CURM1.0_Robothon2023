@@ -17,8 +17,8 @@
         <arg name="namespace_prefix" value="$(arg namespace_prefix)" />
         <arg name="eye_on_hand" value="$(arg eye_on_hand)" />
 
-        <arg name="tracking_base_frame" value="camera_color_optical_frame" />
-        <arg name="tracking_marker_frame" value="marker_7" />
+        <arg name="tracking_base_frame" value="camera_color_frame" />
+        <arg name="tracking_marker_frame" value="aruco_marker_frame" />
         <arg name="robot_base_frame" value="base_link" />
         <arg name="robot_effector_frame" value="link6" />
 

@@ -5,7 +5,7 @@
     <arg name="camera_namespace" default="/camera/color" />
     <!-- <arg name="robot_ip" doc="The IP address of the UR5 robot" default="101.101.101.12" /> -->
 
-    <arg name="marker_size" doc="Size of the ArUco marker used, in meters" default="0.04" />
+    <arg name="marker_size" doc="Size of the ArUco marker used, in meters" default="0.13" />
     <arg name="square_size" doc="The ID of the ArUco marker used" default="0.024" />
     <arg name="square_number_x" default="7" />
     <arg name="square_number_y" default="9" />
@@ -19,7 +19,7 @@
         <param name="camera_namespace" value="$(arg camera_namespace)" />
         <param name="dictionary" value="DICT_4X4_50" />
 
-        <param name="camera_frame" value="camera_color_optical_frame" />
+        <!-- <param name="camera_frame" value="camera_color_optical_frame" /> -->
         <param name="reference_frame" value="camera_color_optical_frame" />
 
         <param name="marker_size" value="$(arg marker_size)" />
