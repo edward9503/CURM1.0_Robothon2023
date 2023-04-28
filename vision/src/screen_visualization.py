@@ -43,8 +43,8 @@ screen_pub = rospy.Publisher('/robothon2023/curm2023_vision/screen_deltaX', Floa
 # 获取数据
 # num 为采集图片次数
 while True:
-    # default deltaX: 4040 means missing detection
-    screen_deltaX = [4040, 4040]
+    # default deltaX: 4040 means missing detection, 0/1 means exist occlusion/no occlusion
+    screen_deltaX = [4040, 4040, 0]
     # 从第 0 个流通道获取一幅图像
     t1 = time.time()
     raw_image = cam.data_stream[0].get_image()
@@ -121,6 +121,7 @@ while True:
             # the thermostat display
             if len(approx) == 4:
                 displayCnt = approx
+                screen_deltaX[2] = 1
                 break
 
         warped = four_point_transform(edged, displayCnt.reshape(4, 2))
