@@ -16,7 +16,6 @@ class ArmJointControlState(EventState):
 	'''
 	State to use primitive MoveJ in Flexiv
 
-    -- input_cmd 	string		The joint command for the robot arm.
     -- blocking 	bool 		Blocks until a message is received.
     -- clear 		bool 		Drops last message on this topic on enter
                                 in order to only handle message received since this state is active.
@@ -25,10 +24,13 @@ class ArmJointControlState(EventState):
     <= failed 					Task is failed.
     '''
 
-	def __init__(self, q1,q2,q3,q4,q5,q6,q7, 
+	def __init__(self,q1,
+			q2,
+			q3,q4,q5,q6,q7, 
 			max_cartesian_vel=0.2, 
 			blocking=True, 
 			clear=False):
+		
 		super(ArmJointControlState, self).__init__(input_keys=['is_debug','is_sim'],
 			outcomes=['done', 'failed'])
 		arm_status_topic = '/arm_task_status',
@@ -44,16 +46,17 @@ class ArmJointControlState(EventState):
 
 		# variables
 		self._connected = False
-
+		
 
 			
 			# Logger.logwarn('Topic %s for state %s not yet available.\n'
             #                'Will try again when entering the state...' % (self._arm_status_topic, self.name))
 
-	def execute(self, userdata):
-		if self.userdata.is_sim:
+	def execute(self, userdata): 
+		if userdata.is_sim:
 			self._connected = True
-			Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join(self._qs)))
+			# assert False
+			Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join([str(q) for q in self._qs])))
 			return 'done'   
 		else:
 			if not self._connected:
@@ -69,7 +72,7 @@ class ArmJointControlState(EventState):
 					return 'done'
 
 	def on_enter(self, userdata):
-		if self.userdata.is_sim:
+		if userdata.is_sim:
 			self._connected = True
 		else:
 			if not self._connected:
@@ -81,11 +84,11 @@ class ArmJointControlState(EventState):
 			if self._connected and self._clear and self._sub.has_msg(self._arm_status_topic):
 				self._sub.remove_last_msg(self._arm_status_topic)
 
-		# publish user input command
-		input_cmd_msg = String()
-		_input_cmd = "MoveJ(target=" + ' '.join(self._qs)+ ", maxVel="+str(self._max_cartesian_vel)+")"
-		input_cmd_msg.data = _input_cmd
-		self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+			# publish user input command
+			input_cmd_msg = String()
+			_input_cmd = "MoveJ(target=" + ' '.join(self._qs)+ ", maxVel="+str(self._max_cartesian_vel)+")"
+			input_cmd_msg.data = _input_cmd
+			self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 
 	def _connect(self):
 		msg_type, msg_arm_status_topic, _ = rostopic.get_topic_class(self._arm_status_topic)
