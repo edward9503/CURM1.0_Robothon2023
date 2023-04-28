@@ -86,7 +86,7 @@ class robothon2023_workflowSM(Behavior):
 
 			# x:628 y:208
 			OperatableStateMachine.add('joint_to_task_ready_position',
-										ArmJointControlState(input_cmd="MoveJ(target=-98.75 -16.01 9.44 124.92 -2.56 47.66 49.25)", blocking=True, clear=False),
+										ArmJointControlState(q1=-98.75, q2=-16.01, q3=9.44, q4=124.92, q5=-2.56, q6=47.66, q7=49.25, max_cartesian_vel=0.2, blocking=True, clear=False),
 										transitions={'done': 'go_above_blue_button', 'failed': 'joint_to_task_ready_position'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'message': 'message'})

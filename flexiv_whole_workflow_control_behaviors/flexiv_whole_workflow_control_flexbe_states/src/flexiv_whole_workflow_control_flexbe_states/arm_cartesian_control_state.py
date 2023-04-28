@@ -11,7 +11,7 @@ from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
 
 # Math related
-from scipy.spatial.transform import Rotation as R
+# from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 from time import sleep
@@ -22,8 +22,12 @@ class ArmCartesianControlState(EventState):
 	This state is used to set the desired joint angles for the flexiv robot arm
 
     -- task 								string		The name of the task to be executed.
-    -- z_offset 							float		The vertical offset for the ee position above the task position.
-														Can be used to move the ee to a task-ready position.
+    -- offset_x 							float		offset x coordinate w.r.t. robot base
+	-- offset_y 							float		offset y coordinate w.r.t. robot base
+	-- offset_z 							float		offset z coordinate w.r.t. robot base
+    -- offset_Rx 							float		offset x axis angle w.r.t. robot base in ZYX represntation
+	-- offset_Ry 							float		offset y axis angle w.r.t. robot base in ZYX represntation
+	-- offset_Rz 							float		offset z axis angle w.r.t. robot base in ZYX represntation
     -- blocking 							bool 		Blocks until a message is received.
     -- clear 								bool 		Drops last message on this topic on enter
                     						            in order to only handle message received since this state is active.
@@ -38,7 +42,14 @@ class ArmCartesianControlState(EventState):
     <= failed 											Task is failed.
     '''
 
-	def __init__(self, task, z_offset=0.0, blocking=True, clear=False):
+	def __init__(self, task, 
+						offset_x=0.0,
+						offset_y=0.0,
+						offset_z=0.0,
+						offset_Rx=0.0,
+						offset_Ry=0.0,
+						offset_Rz=0.0,
+							blocking=True, clear=False):
 		super(ArmCartesianControlState, self).__init__(outcomes=['done', 'failed'],
                                               		   input_keys=['red_button_pose', 'blue_button_pose', 
 							   							   		   'slider_pose', 'red_hole_pose', 
@@ -47,7 +58,8 @@ class ArmCartesianControlState(EventState):
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
 		self._task = task
-		self._z_offset = z_offset
+		self._offset_pos = [offset_x, offset_y, offset_z]
+		self._offset_rot = [offset_Rx, offset_Ry, offset_Rz]
 		self._blocking = blocking
 		self._clear = clear
 		self._connected = False
@@ -77,6 +89,8 @@ class ArmCartesianControlState(EventState):
 				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
 			elif self._task == 'probe':
 				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
+			elif self._task == 'move':
+				input_cmd_msg.data = self._arraryCmd_to_string(self._ZYX2T(*[0,0,0, 0,0,0]))
 			else:
 				Logger.logwarn('None task can be detected.\n'
 		   					   'Please stop the whole process and edit your task name again...')
@@ -116,7 +130,8 @@ class ArmCartesianControlState(EventState):
 			return True
 		return False
 	
-	def _arraryCmd_to_string(self, T):
+	def _arraryCmd_to_string(self, T_des):
+		T = self._ZYX2T(*(self._offset_pos+[0,0,0])) *  T_des *  self._ZYX2T(*([0,0,0]+self._offset_rot))
 		target_zyx_angle = list(T.M.GetEulerZYX())
 		target_position = [T.p.x(), T.p.y(), T.p.z() + self._z_offset]
 		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.3)"
@@ -142,3 +157,30 @@ class ArmCartesianControlState(EventState):
 		for i in ls:
 			ret_str += str(i) + " "
 		return ret_str
+
+	def _Quaternion2T(self, x,y, z, rx, ry, rz, rw):
+		return Frame(Rotation.Quaternion(*[rx, ry, rz, rw]),  Vector(*[x,y,z]))
+	def _PoseStamped2T(self, msg):
+		""" Ros Message:PoseStamped to Frame"""
+				
+		x= msg.pose.position.x
+		y= msg.pose.position.y
+		z= msg.pose.position.z
+
+		Qx = msg.pose.orientation.x
+		Qy = msg.pose.orientation.y
+		Qz = msg.pose.orientation.z
+		Qw = msg.pose.orientation.w
+		T = self._Quaternion2T(x, y, z, Qx,Qy,Qz,Qw)
+		return T
+
+	def _ZYX2T(self,x,y,z, Rx, Ry, Rz):
+		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))
+
+	def _RPY2T(self, x,y, z, R, P, Y):
+		return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
+
+	def _T2RPY(self, T: Frame):
+		pos = [T.p.x(),T.p.y(),T.p.z()]
+		rpy = list(T.M.GetRPY())
+		return np.array(pos), np.array(rpy)
