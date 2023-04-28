@@ -21,7 +21,6 @@ class ArmCartesianControlState(EventState):
 	'''
 	This state is used to set the desired joint angles for the flexiv robot arm
 
-    -- task 								string		The name of task type, value: 'red_button','blue_button', 'slider', 'red_hole','black_hole','rotary_door','probe','move' 
     -- offset_x 							float		offset x coordinate w.r.t. robot base
 	-- offset_y 							float		offset y coordinate w.r.t. robot base
 	-- offset_z 							float		offset z coordinate w.r.t. robot base
@@ -31,29 +30,21 @@ class ArmCartesianControlState(EventState):
     -- blocking 							bool 		Blocks until a message is received.
     -- clear 								bool 		Drops last message on this topic on enter
                     						            in order to only handle message received since this state is active.
-    ># red_button_pose						object		The calibrated red button pose data
-    ># blue_button_pose						object		The calibrated blue button pose data
-    ># slider_pose							object		The calibrated slider pose data
-    ># red_hole_pose						object		The calibrated red hole pose data
-    ># black_hole_pose						object		The calibrated black hole pose data
-    ># rotary_door_grasping_point_pose		object		The calibrated grasping point pose data of rotary door
-    ># probe_grasping_point_pose			object		The calibrated grasping point data of probe
+    ># target_T						        T/None		pose of target
     <= done 											Task has been done or state is not blocking.
     <= failed 											Task is failed.
     '''
 
-	def __init__(self, task, 
-						offset_x=0.0,
+	def __init__(self, offset_x=0.0,
 						offset_y=0.0,
 						offset_z=0.0,
 						offset_Rx=0.0,
 						offset_Ry=0.0,
 						offset_Rz=0.0,
-							blocking=True, clear=False):
+						blocking=True, 
+						clear=False):
 		super(ArmCartesianControlState, self).__init__(outcomes=['done', 'failed'],
-                                              		   input_keys=['red_button_pose', 'blue_button_pose', 
-							   							   		   'slider_pose', 'red_hole_pose', 
-														   		   'black_hole_pose', 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose'])
+                                              		   input_keys=['target_T'])
 		self._arm_status_topic = '/arm_task_status'
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
@@ -75,26 +66,31 @@ class ArmCartesianControlState(EventState):
 		
 		if not self._cmd_published:
 			input_cmd_msg = String()
-			if self._task == 'red_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
-			elif self._task == 'blue_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
-			elif self._task == 'slider':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
-			elif self._task == 'red_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
-			elif self._task == 'black_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
-			elif self._task == 'rotary_door':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
-			elif self._task == 'probe':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
-			elif self._task == 'move':
-				input_cmd_msg.data = self._arraryCmd_to_string(self._ZYX2T(*[0,0,0, 0,0,0]))
+			if userdata.target_T is not None:
+				T = self._ZYX2T(*[0,0,0, 0,0,0])
 			else:
-				Logger.logwarn('None task can be detected.\n'
-		   					   'Please stop the whole process and edit your task name again...')
-				return 'failed'
+				T = userdata.target_T
+			input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
+			# if self._task == 'red_button':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
+			# elif self._task == 'blue_button':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
+			# elif self._task == 'slider':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
+			# elif self._task == 'red_hole':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
+			# elif self._task == 'black_hole':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
+			# elif self._task == 'rotary_door':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
+			# elif self._task == 'probe':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
+			# elif self._task == 'move':
+			# 	input_cmd_msg.data = self._arraryCmd_to_string(self._ZYX2T(*[0,0,0, 0,0,0]))
+			# else:
+			# 	Logger.logwarn('None task can be detected.\n'
+		   	# 				   'Please stop the whole process and edit your task name again...')
+			# 	return 'failed'
 				
 			self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 			self._cmd_published = True
@@ -185,20 +181,4 @@ class ArmCartesianControlState(EventState):
 		rpy = list(T.M.GetRPY())
 		return np.array(pos), np.array(rpy)
 
-
-			if self._task == 'red_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
-			elif self._task == 'blue_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
-			elif self._task == 'slider':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
-			elif self._task == 'red_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
-			elif self._task == 'black_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
-			elif self._task == 'rotary_door':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
-			elif self._task == 'probe':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
-			elif self._task == 'move':
 
