@@ -61,8 +61,16 @@ class ArmCartesianControlState(EventState):
                            'Will try again when entering the state...' % (self._arm_status_topic, self.name))
 
 	def execute(self, userdata):
-		if self.userdata.is_sim:
-			if userdata.is_debug: Logger.loginfo('Successfully finished task.') 
+		if userdata.is_sim:
+			# if userdata.is_debug: Logger.loghint('Successfully finished task.')
+			# Logger.loginfo('[Sucess]: MoveL pos:{}, rot:{}'.format(' '.join([str(q) for q in self._offset_pos]),
+			# 														' '.join([str(q) for q in str(self._offset_rot)])))
+			# printT = lambda _T, T_name: Logger.loginfo("{}: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(T_name, _T.p.x(),_T.p.y(),_T.p.z(),
+			# 																				np.rad2deg(list(_T.M.GetRPY())[0]),
+			# 																				np.rad2deg(list(_T.M.GetRPY())[1]),
+			# 																				np.rad2deg(list(_T.M.GetRPY())[2]),
+			# 																				))
+			# if userdata.is_debug: printT(userdata.target_T, "TargetT ") 
 			return 'done'
 		else:
 			if not self._connected:
@@ -88,7 +96,9 @@ class ArmCartesianControlState(EventState):
 					return 'done'
 
 	def on_enter(self, userdata):
-		if not userdata.is_debug:
+		if userdata.is_sim:
+			pass
+		else:
 			if not self._connected:
 				if self._connect():
 					Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._arm_status_topic)

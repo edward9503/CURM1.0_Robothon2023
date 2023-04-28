@@ -46,7 +46,7 @@ class CalculateTaskPoseState(EventState):
 					probe_grasping_point_pose_local = [0,0.2047,0, 0,0,0]
 					):
 
-		super(CalculateTaskPoseState, self).__init__(
+		super(CalculateTaskPoseState, self).__init__(input_keys=['is_debug','is_sim'],
 					outcomes=['done', 'failed'],
 					output_keys=['red_button_pose', 'blue_button_pose', 
 								'slider_pose', 'red_hole_pose', 
