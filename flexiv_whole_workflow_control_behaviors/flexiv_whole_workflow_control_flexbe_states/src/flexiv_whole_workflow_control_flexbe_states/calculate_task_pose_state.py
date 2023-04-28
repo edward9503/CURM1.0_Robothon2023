@@ -155,6 +155,7 @@ class CalculateTaskPoseState(EventState):
 
 	def _Quaternion2T(self, x,y, z, rx, ry, rz, rw):
 		return Frame(Rotation.Quaternion(*[rx, ry, rz, rw]),  Vector(*[x,y,z]))
+	
 	def _PoseStamped2T(self, msg):
 		""" Ros Message:PoseStamped to Frame"""
 				
