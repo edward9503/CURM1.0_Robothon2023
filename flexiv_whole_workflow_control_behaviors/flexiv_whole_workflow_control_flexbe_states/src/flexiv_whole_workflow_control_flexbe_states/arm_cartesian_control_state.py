@@ -45,11 +45,10 @@ class ArmCartesianControlState(EventState):
 						blocking=True, 
 						clear=False):
 		super(ArmCartesianControlState, self).__init__(outcomes=['done', 'failed'],
-                                              		   input_keys=['target_T'])
+                                              		   input_keys=['target_T', 'is_debug','is_sim'])
 		self._arm_status_topic = '/arm_task_status'
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
-		self._task = task
 		self._offset_pos = [offset_x, offset_y, offset_z]
 		self._offset_rot = [offset_Rx, offset_Ry, offset_Rz]
 		self._blocking = blocking
@@ -62,62 +61,43 @@ class ArmCartesianControlState(EventState):
                            'Will try again when entering the state...' % (self._arm_status_topic, self.name))
 
 	def execute(self, userdata):
-		if not self._connected:
-			return 'failed'
-		
-		if not self._cmd_published:
-			input_cmd_msg = String()
-			if userdata.target_T is not None:
-				T = self._ZYX2T(*[0,0,0, 0,0,0])
-			else:
-				T = userdata.target_T
-			input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
-			# if self._task == 'red_button':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
-			# elif self._task == 'blue_button':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
-			# elif self._task == 'slider':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
-			# elif self._task == 'red_hole':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
-			# elif self._task == 'black_hole':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
-			# elif self._task == 'rotary_door':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
-			# elif self._task == 'probe':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
-			# elif self._task == 'move':
-			# 	input_cmd_msg.data = self._arraryCmd_to_string(self._ZYX2T(*[0,0,0, 0,0,0]))
-			# else:
-			# 	Logger.logwarn('None task can be detected.\n'
-		   	# 				   'Please stop the whole process and edit your task name again...')
-			# 	return 'failed'
-				
-			self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
-			self._cmd_published = True
+		if self.userdata.is_sim:
+			if userdata.is_debug: Logger.loginfo('Successfully finished task.') 
+			return 'done'
+		else:
+			if not self._connected:
+				return 'failed'
+			
+			if not self._cmd_published:
+				input_cmd_msg = String()
+				if userdata.target_T is not None:
+					T = self._ZYX2T(*[0,0,0, 0,0,0])
+				else:
+					T = userdata.target_T
+				input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
+					
+				self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+				self._cmd_published = True
 
-		if self._sub.has_msg(self._arm_status_topic) or not self._blocking:
-            # userdata.message = self._sub.get_last_msg(self._arm_status_topic)
-			if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
-				self._sub.remove_last_msg(self._arm_status_topic)
-				sleep(1.0)    
-				Logger.loginfo('Successfully finished task.')      
-				return 'done'
+			if self._sub.has_msg(self._arm_status_topic) or not self._blocking:
+				# userdata.message = self._sub.get_last_msg(self._arm_status_topic)
+				if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
+					self._sub.remove_last_msg(self._arm_status_topic)
+					sleep(1.0)    
+					Logger.loginfo('Successfully finished task.')      
+					return 'done'
 
 	def on_enter(self, userdata):
-		if not self._connected:
-			if self._connect():
-				Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._arm_status_topic)
-			else:
-				Logger.logwarn('Topic %s still not available, giving up.' % self._arm_status_topic)
+		if not userdata.is_debug:
+			if not self._connected:
+				if self._connect():
+					Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._arm_status_topic)
+				else:
+					Logger.logwarn('Topic %s still not available, giving up.' % self._arm_status_topic)
 
-		if self._connected and self._clear and self._sub.has_msg(self._arm_status_topic):
-			self._sub.remove_last_msg(self._arm_status_topic)
-
-		# publish user input command
-		# input_cmd_msg = String()
-		# input_cmd_msg.data = self._input_cmd
-		# self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+			if self._connected and self._clear and self._sub.has_msg(self._arm_status_topic):
+				self._sub.remove_last_msg(self._arm_status_topic)
+		
 
 	def _connect(self):
 		msg_type, msg_arm_status_topic, _ = rostopic.get_topic_class(self._arm_status_topic)
@@ -172,14 +152,18 @@ class ArmCartesianControlState(EventState):
 		return T
 
 	def _ZYX2T(self,x,y,z, Rx, Ry, Rz):
+		pos = [T.p.x(),T.p.y(),T.p.z()]
+		rpy = list(T.M.GetZYX())
+		return np.array(pos), np.array(rpy)
+	def _T2ZYX(self,x,y,z, Rx, Ry, Rz):
 		return Frame(Rotation.EulerZYX(Rz, Ry, Rx),Vector(*[x,y,z]))
 
-	def _RPY2T(self, x,y, z, R, P, Y):
-		return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
+	# def _RPY2T(self, x,y, z, R, P, Y):
+	# 	return Frame(Rotation.RPY(*[R,P,Y]), Vector(*[x,y,z]))
 
-	def _T2RPY(self, T: Frame):
-		pos = [T.p.x(),T.p.y(),T.p.z()]
-		rpy = list(T.M.GetRPY())
-		return np.array(pos), np.array(rpy)
+	# def _T2RPY(self, T: Frame):
+	# 	pos = [T.p.x(),T.p.y(),T.p.z()]
+	# 	rpy = list(T.M.GetRPY())
+	# 	return np.array(pos), np.array(rpy)
 
 
