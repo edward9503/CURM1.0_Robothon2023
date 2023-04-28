@@ -11,6 +11,7 @@ from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyC
 from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state import ArmCartesianControlState
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
 from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
+from flexiv_whole_workflow_control_flexbe_states.gripper_control_state import GripperControlState
 from flexiv_whole_workflow_control_flexbe_states.slider_control_state import SliderControlState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
@@ -87,6 +88,13 @@ class robothon2023_workflowSM(Behavior):
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
+			# x:228 y:625
+			OperatableStateMachine.add('close_gripper',
+										GripperControlState(pos_ratio=0),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'is_sim': 'is_sim', 'is_debug': 'is_debug'})
+
 			# x:646 y:385
 			OperatableStateMachine.add('go_above_blue_button',
 										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
@@ -111,7 +119,7 @@ class robothon2023_workflowSM(Behavior):
 			# x:240 y:469
 			OperatableStateMachine.add('press_red_button',
 										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'press_red_button'},
+										transitions={'done': 'close_gripper', 'failed': 'press_red_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
