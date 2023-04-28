@@ -80,6 +80,7 @@ class SliderControlState(EventState):
 				while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
 					rospy.loginfo('I am doing')
 					continue
+				self._arm_status_sub.remove_last_msg(self._arm_status_topic)
 
 
 		

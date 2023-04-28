@@ -13,6 +13,7 @@ from flexbe_core.proxy import ProxySubscriberCached
 # Math related
 # from scipy.spatial.transform import Rotation as R
 import numpy as np
+from PyKDL import Frame, Rotation, Vector
 
 from time import sleep
 
@@ -184,21 +185,3 @@ class ArmCartesianControlState(EventState):
 		pos = [T.p.x(),T.p.y(),T.p.z()]
 		rpy = list(T.M.GetRPY())
 		return np.array(pos), np.array(rpy)
-
-
-			if self._task == 'red_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_button_pose)
-			elif self._task == 'blue_button':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.blue_button_pose)
-			elif self._task == 'slider':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.slider_pose)
-			elif self._task == 'red_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.red_hole_pose)
-			elif self._task == 'black_hole':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.black_hole_pose)
-			elif self._task == 'rotary_door':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.rotary_door_grasping_point_pose)
-			elif self._task == 'probe':
-				input_cmd_msg.data = self._arraryCmd_to_string(userdata.probe_grasping_point_pose)
-			elif self._task == 'move':
-

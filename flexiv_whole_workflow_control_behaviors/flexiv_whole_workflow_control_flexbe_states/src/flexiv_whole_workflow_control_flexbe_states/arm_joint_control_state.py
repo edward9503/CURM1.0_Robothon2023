@@ -7,6 +7,8 @@ from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
 from std_msgs.msg import String
 
+from PyKDL import Frame, Rotation, Vector
+
 from time import sleep
 
 
