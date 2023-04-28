@@ -15,6 +15,7 @@ from flexiv_whole_workflow_control_flexbe_states.slider_control_state import Sli
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 import numpy as np
+from PyKDL import Frame, Rotation, Vector
 # [/MANUAL_IMPORT]
 
 
@@ -66,12 +67,12 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:577 y:69
-			OperatableStateMachine.add('Calibrate Board Location',
-										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
-										transitions={'done': 'finished', 'failed': 'Calibrate Board Location'},
+			# x:119 y:153
+			OperatableStateMachine.add('Test_slider',
+										SliderControlState(z_offset=0.0, blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Test_slider'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
 			# x:608 y:163
 			OperatableStateMachine.add('Move_Joint',
@@ -79,13 +80,6 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'done': 'finished', 'failed': 'Move_Joint'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
-
-			# x:166 y:161
-			OperatableStateMachine.add('Test_slider',
-										SliderControlState(z_offset=0.0, blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'Test_slider'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
 			# x:646 y:385
 			OperatableStateMachine.add('go_above_blue_button',
@@ -114,6 +108,13 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'done': 'finished', 'failed': 'press_red_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
+
+			# x:577 y:69
+			OperatableStateMachine.add('Calibrate Board Location',
+										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
+										transitions={'done': 'finished', 'failed': 'Calibrate Board Location'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
 
 
 		return _state_machine
