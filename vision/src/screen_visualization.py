@@ -63,7 +63,7 @@ while True:
     # detect the buttons
     # 颜色范围 HSV
     lower_red_p1 = np.array([0, 43, 46])
-    upper_red_p1 = np.array([10, 255, 255])
+    upper_red_p1 = np.array([20, 255, 255])
     lower_red_p2 = np.array([156, 43, 46])
     upper_red_p2 = np.array([180, 255, 255])
 
