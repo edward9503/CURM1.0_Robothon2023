@@ -1,0 +1,1 @@
+roslaunch flexiv_moveit_config moveit_control.launch robot_ip:=192.168.2.100 local_ip:=192.168.2.107
