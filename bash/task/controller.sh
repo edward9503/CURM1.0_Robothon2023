@@ -1,0 +1,1 @@
+rosrun flexiv_control flexiv_control_loop 192.168.2.100 192.168.2.107

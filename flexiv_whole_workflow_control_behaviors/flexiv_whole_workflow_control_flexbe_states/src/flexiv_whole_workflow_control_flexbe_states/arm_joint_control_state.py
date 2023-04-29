@@ -19,7 +19,6 @@ class ArmJointControlState(EventState):
     -- blocking 	bool 		Blocks until a message is received.
     -- clear 		bool 		Drops last message on this topic on enter
                                 in order to only handle message received since this state is active.
-    #> message		object		Latest message on the given topic of the respective type.
     <= done 					Task has been done or state is not blocking.
     <= failed 					Task is failed.
     '''
@@ -33,7 +32,7 @@ class ArmJointControlState(EventState):
 		
 		super(ArmJointControlState, self).__init__(input_keys=['is_debug','is_sim'],
 			outcomes=['done', 'failed'])
-		arm_status_topic = '/arm_task_status',
+		arm_status_topic = '/arm_task_status'
 		arm_cmd_topic = '/arm_primitive_cmd'
 		self._arm_status_topic = arm_status_topic
 		self._arm_cmd_topic = arm_cmd_topic
@@ -60,15 +59,17 @@ class ArmJointControlState(EventState):
 			return 'done'   
 		else:
 			if not self._connected:
-				userdata.message = None
+				# userdata.message = None
 				return 'failed'
 
+
 			if self._sub.has_msg(self._arm_status_topic) or not self._blocking:
+				# if userdata.is_debug: Logger.loghint("kkk")
 				# userdata.message = self._sub.get_last_msg(self._arm_status_topic)
 				if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
 					self._sub.remove_last_msg(self._arm_status_topic)
 					sleep(1.0)    
-					Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join(self._qs)))      
+					Logger.loginfo('[Sucess]: MoveJ {}'.format(' '.join([str(q) for q in self._qs])))     
 					return 'done'
 
 	def on_enter(self, userdata):
@@ -86,9 +87,10 @@ class ArmJointControlState(EventState):
 
 			# publish user input command
 			input_cmd_msg = String()
-			_input_cmd = "MoveJ(target=" + ' '.join(self._qs)+ ", maxVel="+str(self._max_cartesian_vel)+")"
+			_input_cmd = "MoveJ(target=" + ' '.join([str(q) for q in self._qs])+ ", maxVel="+str(self._max_cartesian_vel)+")"
 			input_cmd_msg.data = _input_cmd
 			self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+			if userdata.is_debug: Logger.loghint("finish enter")
 
 	def _connect(self):
 		msg_type, msg_arm_status_topic, _ = rostopic.get_topic_class(self._arm_status_topic)

@@ -53,7 +53,7 @@ class CalculateTaskPoseState(EventState):
 								'black_hole_pose', 'rotary_door_grasping_point_pose', 
 								'probe_grasping_point_pose','box_base_pose'])
 		board_pose_topic="/robothon2023/curm2023_vision/board_pose"
-		rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml",
+		rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml"
 		self._board_pose_topic = board_pose_topic
 		self._red_button_pose_local = self._ZYX2T(*red_button_pose_local) 
 		self._blue_button_pose_local =self._ZYX2T(*blue_button_pose_local) 
@@ -84,7 +84,7 @@ class CalculateTaskPoseState(EventState):
 				return 'failed'
 
 			if self._sub.has_msg(self._board_pose_topic):
-				if userdata.is_debug: rospy.loghint(self._sub.get_last_msg(self._board_pose_topic).pose.position.z)
+				# if userdata.is_debug: Logger.loghint(self._sub.get_last_msg(self._board_pose_topic).pose.position.z)
 	
 
 				with open(self._rs_cal_file, "r") as stream:
@@ -131,6 +131,7 @@ class CalculateTaskPoseState(EventState):
 		else: 
 			if self._connect():
 				Logger.loginfo('Successfully subscribed to previously failed topic %s' % self._board_pose_topic)
+				pass
 			else:
 				# Logger.logwarn('Topic %s still not available or the camera is not capturing the board.\n' 
 				# 			'Please remember to run the vision nodes before running the state machines or adjust the camera...' % self._board_pose_topic)
