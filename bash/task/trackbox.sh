@@ -1,0 +1,1 @@
+python3 ../../vision/src/board_localization.py
