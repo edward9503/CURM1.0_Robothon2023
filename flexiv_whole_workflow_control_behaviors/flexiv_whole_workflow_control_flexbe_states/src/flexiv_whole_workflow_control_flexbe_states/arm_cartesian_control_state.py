@@ -78,10 +78,10 @@ class ArmCartesianControlState(EventState):
 			
 			if not self._cmd_published:
 				input_cmd_msg = String()
-				if userdata.target_T is not None:
-					T = self._ZYX2T(*[0,0,0, 0,0,0])
-				else:
-					T = userdata.target_T
+				# if userdata.target_T is None:
+				# 	T = self._ZYX2T(*[0,0,0, 0,0,0])
+				# else:
+				T = userdata.target_T
 				input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
 					
 				self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
@@ -120,8 +120,8 @@ class ArmCartesianControlState(EventState):
 	def _arraryCmd_to_string(self, T_des):
 		T = self._ZYX2T(*(self._offset_pos+[0,0,0])) *  T_des *  self._ZYX2T(*([0,0,0]+self._offset_rot))
 		target_zyx_angle = list(T.M.GetEulerZYX())
-		target_position = [T.p.x(), T.p.y(), T.p.z() + self._z_offset]
-		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.3)"
+		target_position = [T.p.x(), T.p.y(), T.p.z()]
+		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.05)"
 		return cmd_string
 
 	def _list2str(self, ls):

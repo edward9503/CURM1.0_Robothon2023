@@ -19,7 +19,7 @@ from PyKDL import Frame, Rotation, Vector
 Kc = np.array([[902.444304254649, 0, 643.936533278185],
                [0, 902.08099534391, 358.417078510844],
                [0, 0, 1]])
-depth = 580 # mm: depth between the plane and the camera
+depth = 538 # mm: depth between the plane and the camera
 IoU_threshold = 0.65 # used for circle check
 
 theta = -102 / 180 * np.pi
