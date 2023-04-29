@@ -1,0 +1,1 @@
+python3 ../../vision/src/screen_visualization.py
