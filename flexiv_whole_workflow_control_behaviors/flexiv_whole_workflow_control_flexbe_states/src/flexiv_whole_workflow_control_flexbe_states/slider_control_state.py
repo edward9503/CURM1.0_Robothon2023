@@ -15,6 +15,7 @@ from flexbe_core.proxy import ProxySubscriberCached
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 from PyKDL import Frame, Rotation, Vector
+import copy
 
 from time import sleep
 
@@ -49,7 +50,8 @@ class SliderControlState(EventState):
 		self._arm_status_topic = '/arm_task_status'
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._screen_info_topic = '/robothon2023/curm2023_vision/screen_deltaX'
-		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
+		self._pub_arm_cmd = ProxyPublisher({self._arm_cmd_topic: String})
+		self._pub_arm_status = ProxyPublisher({self._arm_status_topic: String})
 		self._z_offset = z_offset
 		self._blocking = blocking
 		self._clear = clear
@@ -57,6 +59,7 @@ class SliderControlState(EventState):
 		self._cmd_published = False
 		self._scale_factor = 0.000076755
 		self._current_task_nr = 1
+		self._empty_string_msg = ""
 
 		if not self._connect():
 			Logger.logwarn('Topic %s and %s for state %s not yet available.\n'
@@ -67,7 +70,7 @@ class SliderControlState(EventState):
 			return 'failed'
 		
 		if self._current_task_nr == 1:
-			if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[0] == 4040.0:
+			if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[2] == 0.0:
 				Logger.logwarn('The screen is not detected. \n'
 		   					   'Please move the camera or board...')
 				return 'failed'
@@ -79,12 +82,12 @@ class SliderControlState(EventState):
 					self._current_ee_position += slide_error_global
 					input_cmd_msg = String()
 					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
-					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+					self._pub_arm_cmd.publish(self._arm_cmd_topic, input_cmd_msg)
 					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
 						rospy.loginfo('I am doing1')
 						rospy.loginfo(slide_error_global)
 						continue
-					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
+					self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
 				if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
 					self._current_task_nr += 1
 					Logger.loginfo('Successfully finished the first matching task.')
@@ -92,27 +95,43 @@ class SliderControlState(EventState):
 					Logger.loginfo('Viewed is blocked. Going back to home position.')
 					input_cmd_msg = String()
 					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, userdata.slider_pose.p))
-					self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+					self._pub_arm_cmd.publish(self._arm_cmd_topic, input_cmd_msg)
 					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
-						rospy.loginfo('I am doing blocked')
+						rospy.loginfo('I am doing blocked1')
 						continue
-					self._arm_status_sub.remove_last_msg(self._arm_status_topic)
+					self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
 					return 'failed'
 		else:
-			while self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
-				slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] * self._scale_factor, 0, 0)
-				slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
-				self._current_ee_position += slide_error_global
-				input_cmd_msg = String()
-				input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
-				self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
-				while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
-					rospy.loginfo('I am doing3')
-					rospy.loginfo(slide_error_global)
-					continue
-				self._arm_status_sub.remove_last_msg(self._arm_status_topic)
-			Logger.loginfo('Successfully finished the second matching task.')
-			return 'done'
+			if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[2] == 0.0:
+				Logger.logwarn('The screen is not detected. \n'
+		   					   'Please move the camera or board...')
+				return 'failed'
+			else:
+				while self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] != 4040.0:
+					slide_error_local = Vector(self._screen_info_sub.get_last_msg(self._screen_info_topic).data[1] * self._scale_factor, 0, 0)
+					slide_error_global = userdata.T_RobB_BoxB.M * slide_error_local
+					self._current_ee_position += slide_error_global
+					input_cmd_msg = String()
+					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, self._current_ee_position))
+					self._pub_arm_cmd.publish(self._arm_cmd_topic, input_cmd_msg)
+					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
+						rospy.loginfo('I am doing3')
+						rospy.loginfo(slide_error_global)
+						continue
+					self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
+				if self._screen_info_sub.get_last_msg(self._screen_info_topic).data[2] == 1.0:
+					Logger.loginfo('Successfully finished the second matching task.')
+					return 'done'
+				else:
+					Logger.loginfo('Viewed is blocked. Going back to home position.')
+					input_cmd_msg = String()
+					input_cmd_msg.data = self._arraryCmd_to_string(Frame(userdata.slider_pose.M, userdata.slider_pose.p))
+					self._pub_arm_cmd.publish(self._arm_cmd_topic, input_cmd_msg)
+					while self._arm_status_sub.get_last_msg(self._arm_status_topic).data != "Done.":
+						rospy.loginfo('I am doing blocked2')
+						continue
+					self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
+					return 'failed'
 
 	def on_enter(self, userdata):
 		if not self._connected:
@@ -122,14 +141,14 @@ class SliderControlState(EventState):
 				Logger.logwarn('Topic %s and %s still not available, giving up.' % (self._arm_status_topic, self._screen_info_topic))
 
 		if self._connected and self._clear and self._arm_status_sub.has_msg(self._arm_status_topic):
-			self._arm_status_sub.remove_last_msg(self._arm_status_topic)
+			self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
 
-		self._current_ee_position = userdata.slider_pose.p
+		self._current_ee_position = copy.deepcopy(userdata.slider_pose.p)
 
 		# publish user input command
 		# input_cmd_msg = String()
 		# input_cmd_msg.data = self._input_cmd
-		# self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
+		# self._pub_arm_cmd.publish(self._arm_cmd_topic, input_cmd_msg)
 
 	def _connect(self):
 		msg_arm_status_type, msg_arm_status_topic, _ = rostopic.get_topic_class(self._arm_status_topic)
@@ -137,6 +156,7 @@ class SliderControlState(EventState):
 		if msg_arm_status_topic == self._arm_status_topic and msg_screen_info_topic == self._screen_info_topic:
 			self._arm_status_sub = ProxySubscriberCached({self._arm_status_topic: msg_arm_status_type})
 			self._screen_info_sub = ProxySubscriberCached({self._screen_info_topic: msg_screen_info_type})
+			self._pub_arm_status.publish(self._arm_status_topic, self._empty_string_msg)
 			self._connected = True
 			return True
 		return False

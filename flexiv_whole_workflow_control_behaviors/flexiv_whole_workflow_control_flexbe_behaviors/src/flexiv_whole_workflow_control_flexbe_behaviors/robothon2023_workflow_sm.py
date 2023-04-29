@@ -68,12 +68,12 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:577 y:69
-			OperatableStateMachine.add('Calibrate Board Location',
-										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
-										transitions={'done': 'Move_Joint', 'failed': 'Calibrate Board Location'},
+			# x:69 y:172
+			OperatableStateMachine.add('Test_slider',
+										SliderControlState(z_offset=0.0, blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Test_slider'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
+										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
 			# x:608 y:163
 			OperatableStateMachine.add('Move_Joint',
@@ -81,13 +81,6 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'done': 'go_above_blue_button', 'failed': 'Move_Joint'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
-
-			# x:69 y:172
-			OperatableStateMachine.add('Test_slider',
-										SliderControlState(z_offset=0.0, blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'Test_slider'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
 			# x:228 y:625
 			OperatableStateMachine.add('close_gripper',
@@ -124,12 +117,12 @@ class robothon2023_workflowSM(Behavior):
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
-			# x:577 y:69
+			# x:595 y:45
 			OperatableStateMachine.add('Calibrate Board Location',
 										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
-										transitions={'done': 'finished', 'failed': 'Calibrate Board Location'},
+										transitions={'done': 'Move_Joint', 'failed': 'Calibrate Board Location'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
 
 
 		return _state_machine
