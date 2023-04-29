@@ -127,6 +127,10 @@ while True:
         warped = four_point_transform(edged, displayCnt.reshape(4, 2))
         screen = four_point_transform(rgb_frame, displayCnt.reshape(4, 2))
 
+        # check the direction of the screen
+        if screen.shape[0] > screen.shape[1]:
+            screen = cv2.rotate(screen, cv2.ROTATE_90_CLOCKWISE)
+
         # process the screen
         screen_hsv, screen_lab, screen_bw = getAllColorSpaces(screen)
 
