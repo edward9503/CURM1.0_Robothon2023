@@ -10,9 +10,7 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state import ArmCartesianControlState
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
-from flexiv_whole_workflow_control_flexbe_states.arm_peg_in_hole_state import ArmPegInHoleState
 from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
-from flexiv_whole_workflow_control_flexbe_states.contact_calibration import ContactCalibration
 from flexiv_whole_workflow_control_flexbe_states.gripper_control_state import GripperControlState
 from flexiv_whole_workflow_control_flexbe_states.slider_control_state import SliderControlState
 # Additional imports can be added inside the following tags
@@ -76,14 +74,14 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_5_wrap_cable_and_replace_probe_2_0:
 			# x:208 y:167
 			OperatableStateMachine.add('hover blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press blue button', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('press blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -95,21 +93,21 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_4_open_door_and_probe_circuit_1:
 			# x:208 y:167
 			OperatableStateMachine.add('hover door grasping point',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.06, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="global", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'approach door grasping point', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'rotary_door_grasping_point_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:346
 			OperatableStateMachine.add('open door',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="global", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'rotary_door_upright_hover_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('approach door grasping point',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="global", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'open door', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'rotary_door_grasping_point_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -121,14 +119,14 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_3_plug_probe_to_test_port_2:
 			# x:208 y:167
 			OperatableStateMachine.add('hover blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press blue button', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('press blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -140,14 +138,14 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_2_move_slider_3:
 			# x:208 y:167
 			OperatableStateMachine.add('hover blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press blue button', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('press blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -159,14 +157,14 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_1_press_start_button_4:
 			# x:208 y:167
 			OperatableStateMachine.add('hover blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.05, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.05, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press blue button', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('press blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.01, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.01, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -232,28 +230,28 @@ class robothon2023_workflowSM(Behavior):
 
 			# x:842 y:769
 			OperatableStateMachine.add('go_above_blue_button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press_blue_button', 'failed': 'go_above_blue_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:483 y:755
 			OperatableStateMachine.add('go_above_red_button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.05, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'press_red_button', 'failed': 'press_blue_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:667 y:843
 			OperatableStateMachine.add('press_blue_button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'go_above_red_button', 'failed': 'press_blue_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:259 y:829
 			OperatableStateMachine.add('press_red_button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, maxvel=0.07, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.01, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, offset_reference="local", maxvel=0.07, blocking=True, clear=False),
 										transitions={'done': 'close_gripper', 'failed': 'press_red_button'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})

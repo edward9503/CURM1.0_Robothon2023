@@ -182,10 +182,10 @@ int main(int argc, char* argv[])
                 else if (task_type == "MoveL" | task_type == "MoveJ")
                 {
                     robot.executePrimitive(arm_primitive_cmd.data);
-                    // Wait for reached target
-                    while (flexiv::utility::parsePtStates(
-                            robot.getPrimitiveStates(), "reachedTarget")
-                        != "1") {
+                    std::cout << "commands:" << arm_primitive_cmd.data<< "\n";
+                                                // Wait for reached target
+                    while (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "reachedTarget") != "1")
+                    {
                         std::this_thread::sleep_for(std::chrono::seconds(1));
                     }
                 }

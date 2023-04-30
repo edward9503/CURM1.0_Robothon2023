@@ -43,7 +43,7 @@ class ArmCartesianControlState(EventState):
 						offset_Rx=0.0,
 						offset_Ry=0.0,
 						offset_Rz=0.0,
-						offset_reference="local",
+						offset_reference="global",
 						maxvel=0.07,
 						blocking=True, 
 						clear=False):
@@ -77,6 +77,7 @@ class ArmCartesianControlState(EventState):
 			# 																				np.rad2deg(list(_T.M.GetRPY())[2]),
 			# 																				))
 			# if userdata.is_debug: printT(userdata.target_T, "TargetT ") 
+			input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
 			return 'done'
 		else:
 			if not self._connected:
@@ -131,12 +132,20 @@ class ArmCartesianControlState(EventState):
 	
 	def _arraryCmd_to_string(self, T_des):
 		if self._offset_reference == "local":
-			T = T_des *  self._ZYX2T(*(self._offset_rot+self._offset_rot))
-		elif self._offset_reference == "local":
-			T = self._ZYX2T(*(self._offset_rot+self._offset_rot)) * T_des 
+			T = T_des *  self._ZYX2T(*(self._offset_pos+self._offset_rot))
+		elif self._offset_reference == "global":
+			T = self._ZYX2T(*(self._offset_pos+self._offset_rot)) * T_des 
 		else:
 			raise NotImplementedError
+		printT = lambda _T, T_name: Logger.loginfo("{}: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(T_name, _T.p.x(),_T.p.y(),_T.p.z(),
+																					np.rad2deg(list(_T.M.GetRPY())[0]),
+																					np.rad2deg(list(_T.M.GetRPY())[1]),
+																					np.rad2deg(list(_T.M.GetRPY())[2]),
+																					))
+		printT(T, "targetT_with_offset") 
 		target_zyx_angle = list(T.M.GetEulerZYX())
+		target_zyx_angle = (np.rad2deg(np.array(target_zyx_angle))).tolist()
+		target_zyx_angle = [target_zyx_angle[2],target_zyx_angle[1],target_zyx_angle[0],] # 
 		target_position = [T.p.x(), T.p.y(), T.p.z()]
 		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel="+str(self._maxvel)+")"
 		return cmd_string
