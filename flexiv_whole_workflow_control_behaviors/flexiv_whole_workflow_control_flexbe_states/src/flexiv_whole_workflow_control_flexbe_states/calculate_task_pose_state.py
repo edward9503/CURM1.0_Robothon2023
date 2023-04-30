@@ -43,6 +43,8 @@ class CalculateTaskPoseState(EventState):
 					red_hole_pose_local = [-0.0113,0.0584,0, 0,0,0], 
 					black_hole_pose_local =[0.0136,0.0583,0, 0,0,0], 
 					rotary_door_grasping_point_pose_local = [0.0067,0.1468,0, 0,0,0], 
+					rotary_door_upright_hover_pose = [-0.05326,0.1468,0.07017, 0,0,0], 
+					probe_hole_local = [-0.04123,0.1468,0, 0,0,0],
 					probe_grasping_point_pose_local = [0,0.2047,0, 0,0,0]
 					):
 
@@ -50,7 +52,8 @@ class CalculateTaskPoseState(EventState):
 					outcomes=['done', 'failed'],
 					output_keys=['red_button_pose', 'blue_button_pose', 
 								'slider_pose', 'red_hole_pose', 
-								'black_hole_pose', 'rotary_door_grasping_point_pose', 
+								'black_hole_pose', 'rotary_door_grasping_point_pose',
+								'rotary_door_upright_hover_pose', 'probe_hole_pose',
 								'probe_grasping_point_pose','box_base_pose'])
 		board_pose_topic="/robothon2023/curm2023_vision/board_pose"
 		rs_cal_file="/home/ben/.ros/easy_handeye/flexiv_realsense_handeyecalibration_eye_on_base.yaml"
@@ -60,7 +63,9 @@ class CalculateTaskPoseState(EventState):
 		self._slider_pose_local = self._ZYX2T(*slider_pose_local) 
 		self._red_hole_pose_local = self._ZYX2T(*red_hole_pose_local)
 		self._black_hole_pose_local =self._ZYX2T(*black_hole_pose_local) 
-		self._rotary_door_grasping_point_pose_local = self._ZYX2T(*rotary_door_grasping_point_pose_local) 
+		self._rotary_door_grasping_point_pose_local = self._ZYX2T(*rotary_door_grasping_point_pose_local)
+		self._rotary_door_upright_hover_pose_local = self._ZYX2T(*rotary_door_upright_hover_pose)
+		self._probe_hole_local = self._ZYX2T(*probe_hole_local) 
 		self._probe_grasping_point_pose_local = self._ZYX2T(*probe_grasping_point_pose_local) 
 		self._rs_cal_file = rs_cal_file
 
@@ -110,6 +115,8 @@ class CalculateTaskPoseState(EventState):
 				userdata.red_hole_pose = userdata.box_base_pose * self._red_hole_pose_local
 				userdata.black_hole_pose = userdata.box_base_pose * self._black_hole_pose_local
 				userdata.rotary_door_grasping_point_pose = userdata.box_base_pose * self._rotary_door_grasping_point_pose_local
+				userdata.rotary_door_upright_hover_pose = userdata.box_base_pose * self._rotary_door_upright_hover_pose_local
+				userdata.probe_hole_pose = userdata.box_base_pose * self._probe_hole_local
 				userdata.probe_grasping_point_pose = userdata.box_base_pose * self._probe_grasping_point_pose_local
 
 
