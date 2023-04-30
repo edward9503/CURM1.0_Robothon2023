@@ -36,14 +36,16 @@ class ContactCalibration(EventState):
     <= failed 											Task is failed.
     '''
 
-	def __init__(self,):
+	def __init__(self,contactDir='[0,0,1]',freeSpaceVel=0.01):
 		super(ContactCalibration, self).__init__(outcomes=['done', 'failed'],
-                                              		   input_keys=['red_button_pose', 'is_debug','is_sim'])
+                                              		   input_keys=['red_button_pose', 'is_debug','is_sim'],
+													   output_keys=['current_tcp'])
 		self._arm_status_topic = '/arm_task_status'
 		self._arm_cmd_topic = '/arm_primitive_cmd'
 		self._arm_tcp_topic = '/arm_tcp_state'
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
-
+		self._contactDir = contactDir
+		self._freeSpaceVel = freeSpaceVel
 
 
 		self._connected = False
@@ -56,13 +58,21 @@ class ContactCalibration(EventState):
 			if not self._connected:
 				return 'failed'
 			
-			Logger.loghint(f"okkkk")
+
 			if self._sub.has_msg(self._arm_status_topic):
 				# userdata.message = self._sub.get_last_msg(self._arm_status_topic)
-				Logger.loghint(f"get")
+
 				if self._sub.get_last_msg(self._arm_status_topic).data == "Done.":
-					Logger.loghint(f"xxxx")
+
 					pose = self._sub_tcp.get_last_msg(self._arm_tcp_topic)
+					T = self._PoseStamped2T(pose)
+					printT = lambda _T, T_name: Logger.loghint("{}: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(T_name, _T.p.x(),_T.p.y(),_T.p.z(),
+																							np.rad2deg(list(_T.M.GetEulerZYX())[0]),
+																							np.rad2deg(list(_T.M.GetEulerZYX())[1]),
+																							np.rad2deg(list(_T.M.GetEulerZYX())[2]),
+																							))
+					if userdata.is_debug: printT(T, "current tcp w.r.t. base")
+					userdata.current_tcp = T
 					return 'done'
 			
 
@@ -70,10 +80,9 @@ class ContactCalibration(EventState):
 		self._connect()
 		sleep(1.0)
 		input_cmd_msg = String()
-		input_cmd_msg.data = "AlignContact(maxVel=0.02,contactDir=1 0 0)"
-		Logger.loghint(f"publish")
+		input_cmd_msg.data = "AlignContact(contactDir="+self._contactDir+",freeSpaceVel="+self._freeSpaceVel+")"
 		self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
-		Logger.loghint(f"published!!!!")
+
 		
 	def _connect(self):
 		msg_type, msg_arm_status_topic, _ = rostopic.get_topic_class(self._arm_status_topic) 
