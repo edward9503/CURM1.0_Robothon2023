@@ -10,6 +10,7 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state import ArmCartesianControlState
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
+from flexiv_whole_workflow_control_flexbe_states.arm_peg_in_hole_state import ArmPegInHoleState
 from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
 from flexiv_whole_workflow_control_flexbe_states.gripper_control_state import GripperControlState
 from flexiv_whole_workflow_control_flexbe_states.slider_control_state import SliderControlState
@@ -163,10 +164,10 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:318 y:22
-			OperatableStateMachine.add('Move Ready Pose',
-										ArmJointControlState(q1=-81, q2=-25, q3=28, q4=139, q5=-5, q6=79, q7=94, max_cartesian_vel=0.04, blocking=True, clear=False),
-										transitions={'done': 'Calibrate Board Location', 'failed': 'Move Ready Pose'},
+			# x:112 y:319
+			OperatableStateMachine.add('Test_peg_in_hole',
+										ArmPegInHoleState(contactAxis="0.00.0-1.0", searchAxis="1.00.00.0", contactForce="5", radius="0.015", startDensity="2", timeFactor="2", wiggleRange="0", wigglePeriod="0.3", randomFactor="0", startSearchImmediately="0", searchStiffnessRatio="1", blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Test_peg_in_hole'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
@@ -204,6 +205,13 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'done': 'finished', 'failed': 'Calibrate Board Location'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
+
+			# x:318 y:22
+			OperatableStateMachine.add('Move Ready Pose',
+										ArmJointControlState(q1=-81, q2=-25, q3=28, q4=139, q5=-5, q6=79, q7=94, max_cartesian_vel=0.04, blocking=True, clear=False),
+										transitions={'done': 'Calibrate Board Location', 'failed': 'Move Ready Pose'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:69 y:172
 			OperatableStateMachine.add('Test_slider',
