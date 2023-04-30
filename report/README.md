@@ -71,7 +71,9 @@ python vision/src/screen_perception.py
 ```
 Finally, run the task planning and execution, which includes activate the low-level control loop of the robot arms and the dual grippers.
 ```
-rosrun rosserial_arduino rosserial.py [port_name]
+source bash/controller_left.sh
+source bash/controller_right.sh
+rosrun rosserial_arduino serial_node.py [port_name]
 ```
 
 
