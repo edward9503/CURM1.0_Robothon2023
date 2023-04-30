@@ -143,22 +143,24 @@ int main(int argc, char* argv[])
                 // std::this_thread::sleep_for(std::chrono::seconds(5));
                  std::cout << "finish calibrate!!!\n";
                 // robot.executePrimitive("MoveJ(target=131 7 56 120 -3 25 -132, maxVel=0.07)");
-                robot.executePrimitive("AlignContact(maxVel=0.1)");
-                // robot.executePrimitive("PihSpiral(maxVel=0.1, contactForce=1)");
-                // // Wait for reached target
-                // while (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted")=="False" & ros::ok()) {
-                //     std::this_thread::sleep_for(std::chrono::seconds(1));
-                //     std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
-                // }
-                while (ros::ok()) {
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                    std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
-                    if (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted")=="1"){
-                        robot.executePrimitive("Hold()");
-                        std::cout << "send hold.."
-                                  << "\n";
-                        break;
-                    }
+                 robot.executePrimitive("AlignContact(maxVel=0.02,contactDir=1 0 0)");
+                 // robot.executePrimitive("PihSpiral(maxVel=0.1, contactForce=1)");
+                 // // Wait for reached target
+                 // while (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted")=="False" & ros::ok()) {
+                 //     std::this_thread::sleep_for(std::chrono::seconds(1));
+                 //     std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
+                 // }
+                 while (ros::ok())
+                 {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
+            if (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") == "1")
+            {
+                robot.executePrimitive("Hold()");
+                std::cout << "send hold.."
+                          << "\n";
+                break;
+            }
                 }
                
 

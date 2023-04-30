@@ -133,16 +133,25 @@ int main(int argc, char* argv[])
         while (ros::ok()){
             if (last_arm_primitive_cmd.data != arm_primitive_cmd.data){
                 std::cout << "I am not equal!!!\n";
+                std::string task_type;
+                task_type = arm_primitive_cmd.data.substr(0, arm_primitive_cmd.data.find("("));
+                            // Send command to robot
+                std::cout << "running task_type:"<<task_type << "..\n";
 
-                // Send command to robot
-                robot.executePrimitive(arm_primitive_cmd.data);
-
-                if (arm_primitive_cmd.data.substr(0, arm_primitive_cmd.data.find("(")) == "AlignContact"){
-                    // do something until the contact mode is done!!!
-                    // add your code here
-                    std::cout << "I am doing AlignContact!!!\n";
+                if (task_type == "AlignContact")
+                {
+                    robot.executePrimitive("CaliForceSensor()");
+                    robot.executePrimitive(arm_primitive_cmd.data);
+                    while (ros::ok() &
+                           flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") == "1")
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    }
+                    robot.executePrimitive("Hold()");
                 }
-                else if (arm_primitive_cmd.data.substr(0, arm_primitive_cmd.data.find("(")) == "SlideSpiral"){
+                else if (task_type == "SlideSpiral")
+                {
+                    robot.executePrimitive(arm_primitive_cmd.data);
                     // Execute the spiral peg-in-hole motion until the pushDistance reaches the threshold
                     while (ros::ok() & 
                            flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "pushDistance") < "0.019") {
@@ -153,13 +162,18 @@ int main(int argc, char* argv[])
                     robot.executePrimitive("Hold()");
                     std::cout << "I am sending hold!!!\n";
                 }
-                else{
+                else if (task_type == "MoveL" | task_type == "MoveJ")
+                {
+                    robot.executePrimitive(arm_primitive_cmd.data);
                     // Wait for reached target
                     while (flexiv::utility::parsePtStates(
                             robot.getPrimitiveStates(), "reachedTarget")
                         != "1") {
                         std::this_thread::sleep_for(std::chrono::seconds(1));
                     }
+                }
+                else{
+                    robot.executePrimitive(arm_primitive_cmd.data);
                 }
 
                 std::cout << "I am done!!!\n";
