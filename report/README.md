@@ -54,8 +54,7 @@ to the seperate board tasks. The BT is shown in the figure below. We offline des
 origin to the real-time board pose estimation.
 
 ### Controllers
-In our framework, all the controllers are implemented in ROS control. We use the jocobian-solver to reach the target pose.
-XXX (to be implemented)
+In our framework, all the controllers are modularly implemented based on the primitive control provided by Flexiv. All the controllers are integrated in a behavior tree manner using ROS. Specificly, tasks that involving target pose reaching is mainly based on the IK of robot arm. 
 
 ## Quick start
 First, load the robot description and the controllers:
