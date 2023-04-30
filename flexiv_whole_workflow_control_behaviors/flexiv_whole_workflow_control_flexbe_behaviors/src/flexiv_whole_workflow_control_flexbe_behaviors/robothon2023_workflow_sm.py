@@ -12,6 +12,7 @@ from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state imp
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
 from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
 from flexiv_whole_workflow_control_flexbe_states.gripper_control_state import GripperControlState
+from flexiv_whole_workflow_control_flexbe_states.hard_code_state import HardCodeState
 from flexiv_whole_workflow_control_flexbe_states.slider_control_state import SliderControlState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
@@ -57,7 +58,7 @@ class robothon2023_workflowSM(Behavior):
 		_state_machine.userdata.slider_pose = None
 		_state_machine.userdata.red_button_pose = None
 		_state_machine.userdata.blue_button_pose = None
-		_state_machine.userdata.T_RobB_BoxB = None
+		_state_machine.userdata.T_RobB_BoxB = Frame(Rotation.EulerZYX(math.radians(45), math.radians(0), math.radians(0)),Vector(-0.231681,0.526752,0.172542))
 		_state_machine.userdata.is_sim = False
 		_state_machine.userdata.is_debug = True
 		_state_machine.userdata.probe_hole_pose = None
@@ -172,12 +173,12 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:1289 y:469
-			OperatableStateMachine.add('4_open door and probe circuit',
-										_sm_4_open_door_and_probe_circuit_1,
-										transitions={'finished': 'finished', 'failed': '4_open door and probe circuit'},
-										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'is_sim': 'is_sim', 'is_debug': 'is_debug', 'rotary_door_upright_hover_pose': 'rotary_door_upright_hover_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose'})
+			# x:372 y:103
+			OperatableStateMachine.add('magicstate',
+										HardCodeState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], rotary_door_upright_hover_pose=[-0.05326,0.1468,0.07017,0,0,0], probe_hole_local=[-0.04123,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
+										transitions={'done': 'finished', 'failed': 'magicstate'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'box_base_pose': 'T_RobB_BoxB', 'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'rotary_door_upright_hover_pose': 'rotary_door_upright_hover_pose', 'probe_hole_pose': 'probe_hole_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose'})
 
 			# x:982 y:308
 			OperatableStateMachine.add('2_move slider',
@@ -192,6 +193,13 @@ class robothon2023_workflowSM(Behavior):
 										transitions={'finished': '4_open door and probe circuit', 'failed': '3_plug probe to test port'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
 										remapping={'blue_button_pose': 'blue_button_pose', 'is_sim': 'is_sim', 'is_debug': 'is_debug'})
+
+			# x:1289 y:469
+			OperatableStateMachine.add('4_open door and probe circuit',
+										_sm_4_open_door_and_probe_circuit_1,
+										transitions={'finished': 'finished', 'failed': '4_open door and probe circuit'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
+										remapping={'is_sim': 'is_sim', 'is_debug': 'is_debug', 'rotary_door_upright_hover_pose': 'rotary_door_upright_hover_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose'})
 
 			# x:972 y:535
 			OperatableStateMachine.add('5_wrap cable and replace probe_2',
