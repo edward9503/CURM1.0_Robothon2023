@@ -49,11 +49,12 @@ warped the screen region into the normal rectangular region. We further segment 
 and use the triangular fitting to find the peak position. 
 
 ## Gripper Hardware Setup
+### Install 
 - Install the necessary ros package related to the Arduino/ROS (only neotic is well-tested now)
 ```
 sudo apt-get install ros-${ROS_DISTRO}-rosserial-arduino
 sudo apt-get install ros-${ROS_DISTRO}-rosserial
 ```
-- Usage
--- Connect the Arduino board with PC and check which port is being used (such as dev/ttyACM0);
--- Run the rosserial node to setup the communication between ROS and Arduino: ```rosrun rosserial_arduino serial_node.py [port_name]```, then the gripper control node is in active;
+### Usage
+- Connect the Arduino board with PC and check which port is being used (such as dev/ttyACM0);
+- Run the rosserial node to setup the communication between ROS and Arduino: ```rosrun rosserial_arduino serial_node.py [port_name]```, then the gripper control node is in active;
