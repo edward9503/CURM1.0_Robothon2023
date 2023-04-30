@@ -148,14 +148,14 @@ class robothon2023_workflowSM(Behavior):
 		with _sm_1_press_start_button_4:
 			# x:208 y:167
 			OperatableStateMachine.add('hover blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.05, blocking=True, clear=False),
 										transitions={'done': 'press blue button', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:663 y:250
 			OperatableStateMachine.add('press blue button',
-										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.0, blocking=True, clear=False),
+										ArmCartesianControlState(offset_x=0.0, offset_y=0.0, offset_z=0.0, offset_Rx=0.0, offset_Ry=0.0, offset_Rz=0.01, blocking=True, clear=False),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'blue_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
@@ -163,12 +163,12 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:595 y:45
-			OperatableStateMachine.add('Calibrate Board Location',
-										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
-										transitions={'done': 'Move_Joint', 'failed': 'Calibrate Board Location'},
+			# x:318 y:22
+			OperatableStateMachine.add('Move Ready Pose',
+										ArmJointControlState(q1=-81, q2=-25, q3=28, q4=139, q5=-5, q6=79, q7=94, max_cartesian_vel=0.04, blocking=True, clear=False),
+										transitions={'done': 'Calibrate Board Location', 'failed': 'Move Ready Pose'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:982 y:308
 			OperatableStateMachine.add('2_move slider',
@@ -194,21 +194,21 @@ class robothon2023_workflowSM(Behavior):
 			# x:972 y:535
 			OperatableStateMachine.add('5_wrap cable and replace probe_2',
 										_sm_5_wrap_cable_and_replace_probe_2_0,
-										transitions={'finished': '1_press start button', 'failed': '5_wrap cable and replace probe_2'},
+										transitions={'finished': '5_wrap cable and replace probe_2', 'failed': '5_wrap cable and replace probe_2'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
 										remapping={'blue_button_pose': 'blue_button_pose', 'is_sim': 'is_sim', 'is_debug': 'is_debug'})
 
-			# x:608 y:163
-			OperatableStateMachine.add('Move_Joint',
-										ArmJointControlState(q1=-117.25, q2=-37, q3=0.4, q4=127, q5=5, q6=76, q7=49, max_cartesian_vel=0.02, blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'Move_Joint'},
+			# x:807 y:54
+			OperatableStateMachine.add('Calibrate Board Location',
+										CalculateTaskPoseState(red_button_pose_local=[0,0,0,0,0,0], blue_button_pose_local=[0.0136,0,0,0,0,0], slider_pose_local=[-0.0827,0.0348,0,0,0,0], red_hole_pose_local=[-0.0113,0.0584,0,0,0,0], black_hole_pose_local=[0.0136,0.0583,0,0,0,0], rotary_door_grasping_point_pose_local=[0.0067,0.1468,0,0,0,0], probe_grasping_point_pose_local=[0,0.2047,0,0,0,0]),
+										transitions={'done': '1_press start button', 'failed': 'Calibrate Board Location'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim', 'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'box_base_pose': 'box_base_pose'})
 
 			# x:69 y:172
 			OperatableStateMachine.add('Test_slider',
 										SliderControlState(z_offset=0.0, blocking=True, clear=False),
-										transitions={'done': 'Calibrate Board Location', 'failed': 'Test_slider'},
+										transitions={'done': 'Test_slider', 'failed': 'Test_slider'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'red_button_pose': 'red_button_pose', 'blue_button_pose': 'blue_button_pose', 'slider_pose': 'slider_pose', 'red_hole_pose': 'red_hole_pose', 'black_hole_pose': 'black_hole_pose', 'rotary_door_grasping_point_pose': 'rotary_door_grasping_point_pose', 'probe_grasping_point_pose': 'probe_grasping_point_pose', 'T_RobB_BoxB': 'T_RobB_BoxB'})
 
@@ -247,7 +247,7 @@ class robothon2023_workflowSM(Behavior):
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'target_T': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
-			# x:945 y:153
+			# x:928 y:207
 			OperatableStateMachine.add('1_press start button',
 										_sm_1_press_start_button_4,
 										transitions={'finished': 'finished', 'failed': '1_press start button'},

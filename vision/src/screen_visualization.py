@@ -63,7 +63,7 @@ while True:
     # detect the buttons
     # 颜色范围 HSV
     lower_red_p1 = np.array([0, 43, 46])
-    upper_red_p1 = np.array([10, 255, 255])
+    upper_red_p1 = np.array([20, 255, 255])
     lower_red_p2 = np.array([156, 43, 46])
     upper_red_p2 = np.array([180, 255, 255])
 
@@ -78,6 +78,12 @@ while True:
         # Processing the filted red region
         kernel = np.ones((5, 5), np.uint8)
         opening = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+
+        # handle the extra red button
+        num_opening_mask, labels_opening_mask, stats_opening_mask, centroids_opening_mask = cv2.connectedComponentsWithStats(
+            opening, connectivity=8)
+        area_sorted_opening_mask = np.argsort(stats_opening_mask[:, cv2.CC_STAT_AREA])[::-1]
+        opening = (labels_opening_mask == area_sorted_opening_mask[1]).astype("uint8") * 255
 
         rgb_frame_plot = rgb_frame.copy()
 
