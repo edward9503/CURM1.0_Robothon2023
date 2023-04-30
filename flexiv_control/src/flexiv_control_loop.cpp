@@ -137,11 +137,29 @@ int main(int argc, char* argv[])
                 // Send command to robot
                 robot.executePrimitive(arm_primitive_cmd.data);
 
-                // Wait for reached target
-                while (flexiv::utility::parsePtStates(
-                        robot.getPrimitiveStates(), "reachedTarget")
-                    != "1") {
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                if (arm_primitive_cmd.data.substr(0, arm_primitive_cmd.data.find("(")) == "AlignContact"){
+                    // do something until the contact mode is done!!!
+                    // add your code here
+                    std::cout << "I am doing AlignContact!!!\n";
+                }
+                else if (arm_primitive_cmd.data.substr(0, arm_primitive_cmd.data.find("(")) == "SlideSpiral"){
+                    // Execute the spiral peg-in-hole motion until the pushDistance reaches the threshold
+                    while (ros::ok() & 
+                           flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "pushDistance") < "0.019") {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                    }
+
+                    // Send command to stop the robot
+                    robot.executePrimitive("Hold()");
+                    std::cout << "I am sending hold!!!\n";
+                }
+                else{
+                    // Wait for reached target
+                    while (flexiv::utility::parsePtStates(
+                            robot.getPrimitiveStates(), "reachedTarget")
+                        != "1") {
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }
                 }
 
                 std::cout << "I am done!!!\n";
