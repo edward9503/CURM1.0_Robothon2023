@@ -136,26 +136,29 @@ int main(int argc, char* argv[])
 
         // Get the robot states
         robot.getRobotStates(robotStates);
+        auto start_tcpPose = robotStates.tcpPose;
 
                 // Send command to robot
                 // robot.executePrimitive(arm_primitive_cmd.data);
                 robot.executePrimitive("CaliForceSensor()");
                 std::this_thread::sleep_for(std::chrono::seconds(5));
-                 std::cout << "finish calibrate!!!\n";
+                std::cout << "finish calibrate!!!\n";
                 // robot.executePrimitive("MoveJ(target=131 7 56 120 -3 25 -132, maxVel=0.07)");
                 // robot.executePrimitive("AlignContact(maxVel=0.1)");
-                robot.executePrimitive("PihSpiral(maxVel=0.1, contactForce=1)");
+                robot.executePrimitive("SlideSpiral(contactForce=5)");
                 // // Wait for reached target
                 // while (flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted")=="False" & ros::ok()) {
                 //     std::this_thread::sleep_for(std::chrono::seconds(1));
                 //     std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
                 // }
-                while (ros::ok()) {
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                    std::cout << flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") << "\n";
+                while (ros::ok() 
+                    & flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "pushDistance") < "0.019") {
+                    robot.getRobotStates(robotStates);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    std::cout << "distance error: \n" << start_tcpPose[2] - robotStates.tcpPose[2] << "\n";
                 }
 
-                // std::cout << "I am done!!!\n";
+                std::cout << "I am done!!!\n";
                 // arm_primitive_cmd.data = empty_msg.data;
                 // last_arm_primitive_cmd.data = empty_msg.data;
                 // arm_task_status_pub.publish(arm_task_status_msg);
