@@ -12,6 +12,7 @@ from flexiv_whole_workflow_control_flexbe_states.arm_cartesian_control_state imp
 from flexiv_whole_workflow_control_flexbe_states.arm_joint_control_state import ArmJointControlState
 from flexiv_whole_workflow_control_flexbe_states.arm_peg_in_hole_state import ArmPegInHoleState
 from flexiv_whole_workflow_control_flexbe_states.calculate_task_pose_state import CalculateTaskPoseState
+from flexiv_whole_workflow_control_flexbe_states.contact_calibration import ContactCalibration
 from flexiv_whole_workflow_control_flexbe_states.gripper_control_state import GripperControlState
 from flexiv_whole_workflow_control_flexbe_states.slider_control_state import SliderControlState
 # Additional imports can be added inside the following tags
@@ -164,12 +165,12 @@ class robothon2023_workflowSM(Behavior):
 
 
 		with _state_machine:
-			# x:112 y:319
-			OperatableStateMachine.add('Test_peg_in_hole',
-										ArmPegInHoleState(contactAxis="0.00.0-1.0", searchAxis="1.00.00.0", contactForce="5", radius="0.015", startDensity="2", timeFactor="2", wiggleRange="0", wigglePeriod="0.3", randomFactor="0", startSearchImmediately="0", searchStiffnessRatio="1", blocking=True, clear=False),
-										transitions={'done': 'finished', 'failed': 'Test_peg_in_hole'},
+			# x:359 y:108
+			OperatableStateMachine.add('contact calibration',
+										ContactCalibration(),
+										transitions={'done': 'finished', 'failed': 'contact calibration'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
+										remapping={'red_button_pose': 'red_button_pose', 'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 
 			# x:982 y:308
 			OperatableStateMachine.add('2_move slider',
@@ -210,6 +211,13 @@ class robothon2023_workflowSM(Behavior):
 			OperatableStateMachine.add('Move Ready Pose',
 										ArmJointControlState(q1=-81, q2=-25, q3=28, q4=139, q5=-5, q6=79, q7=94, max_cartesian_vel=0.04, blocking=True, clear=False),
 										transitions={'done': 'Calibrate Board Location', 'failed': 'Move Ready Pose'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
+
+			# x:112 y:319
+			OperatableStateMachine.add('Test_peg_in_hole',
+										ArmPegInHoleState(contactAxis="0.00.0-1.0", searchAxis="1.00.00.0", contactForce="5", radius="0.015", startDensity="2", timeFactor="2", wiggleRange="0", wigglePeriod="0.3", randomFactor="0", startSearchImmediately="0", searchStiffnessRatio="1", blocking=True, clear=False),
+										transitions={'done': 'finished', 'failed': 'Test_peg_in_hole'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'is_debug': 'is_debug', 'is_sim': 'is_sim'})
 

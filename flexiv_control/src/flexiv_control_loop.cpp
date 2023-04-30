@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <thread>
-
+#include "geometry_msgs/PoseStamped.h"
 std_msgs::String arm_primitive_cmd;
 
 void printHelp()
@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
 
     ros::Publisher arm_task_status_pub = n.advertise<std_msgs::String>("/arm_task_status", 1);
     ros::Publisher arm_primitive_cmd_pub = n.advertise<std_msgs::String>("/arm_primitive_cmd", 1);  // This is specifically used for cleaning the topic data
+    ros::Publisher tcp_pub = n.advertise<geometry_msgs::PoseStamped>("/arm_tcp_state", 1);
     ros::Subscriber arm_primitive_cmd_sub = n.subscribe("/arm_primitive_cmd", 1, armPrimitiveCmdCallback);
 
     // Log object for printing message with timestamp and coloring
@@ -127,10 +128,15 @@ int main(int argc, char* argv[])
         // Clean the topic before entering the while loop
         arm_task_status_pub.publish(empty_msg);
         arm_primitive_cmd_pub.publish(empty_msg);
+        geometry_msgs::PoseStamped empty_pose;
+        tcp_pub.publish(empty_pose);
         ros::spinOnce();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        while (ros::ok()){
+
+
+            while (ros::ok())
+        {
             if (last_arm_primitive_cmd.data != arm_primitive_cmd.data){
                 std::cout << "I am not equal!!!\n";
                 std::string task_type;
@@ -143,11 +149,23 @@ int main(int argc, char* argv[])
                     robot.executePrimitive("CaliForceSensor()");
                     robot.executePrimitive(arm_primitive_cmd.data);
                     while (ros::ok() &
-                           flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") == "1")
+                           flexiv::utility::parsePtStates(robot.getPrimitiveStates(), "alignContacted") == "0")
                     {
                         std::this_thread::sleep_for(std::chrono::milliseconds(200));
                     }
                     robot.executePrimitive("Hold()");
+                    geometry_msgs::PoseStamped poseStamped2;
+                    poseStamped2.header.stamp = ros::Time::now();
+                    robot.getRobotStates(robotStates);
+                    poseStamped2.pose.position.x = robotStates.tcpPose[0];
+                    poseStamped2.pose.position.y = robotStates.tcpPose[1];
+                    poseStamped2.pose.position.z = robotStates.tcpPose[2];
+
+                    poseStamped2.pose.orientation.x = robotStates.tcpPose[3];
+                    poseStamped2.pose.orientation.y = robotStates.tcpPose[4];
+                    poseStamped2.pose.orientation.z = robotStates.tcpPose[5];
+                    poseStamped2.pose.orientation.w = robotStates.tcpPose[6];
+                    tcp_pub.publish(poseStamped2);
                 }
                 else if (task_type == "SlideSpiral")
                 {

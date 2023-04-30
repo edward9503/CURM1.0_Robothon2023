@@ -121,7 +121,7 @@ class CalculateTaskPoseState(EventState):
 				if userdata.is_debug: printT(userdata.box_base_pose, "box base w.r.t. robot base")
 				if userdata.is_debug: printT(userdata.blue_button_pose, "blue button w.r.t. robot base")
 				if userdata.is_debug: printT(userdata.red_hole_pose, "red hole w.r.t. robot base")
-				if userdata.is_debug: printT(userdata.black_hole_pose, "box base w.r.t. robot base")
+				if userdata.is_debug: printT(userdata.black_hole_pose, "black hole w.r.t. robot base")
 
 				return 'done'
 
