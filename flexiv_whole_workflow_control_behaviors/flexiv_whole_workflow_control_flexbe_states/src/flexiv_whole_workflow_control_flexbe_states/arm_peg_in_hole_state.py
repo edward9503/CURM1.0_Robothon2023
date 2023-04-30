@@ -16,7 +16,7 @@ class ArmPegInHoleState(EventState):
 	'''
 	State to use primitive MoveJ in Flexiv
 
-    -- contactAxis 				string 		contact (force control) axis in TCP frame, it has to be one of TCP’s principal axes
+    -- contactAxis 				string 		contact (force control) axis in TCP frame, it has to be one of TCP principal axes
     -- searchAxis 				string 		search axis in TCP frame, it has to be perpendicular to the contact axis
     -- contactForce 			string 		contact force when searching on the surface
     -- radius 					string 		search area radius
@@ -44,8 +44,8 @@ class ArmPegInHoleState(EventState):
     <= failed 								Task is failed.
     '''
 
-	def __init__(self, contactAxis = "0.0 0.0 -1.0",
-					   searchAxis = "1.0 0.0 0.0",
+	def __init__(self, contactAxis = "0 0 1",
+					   searchAxis = "1 0 0",
 					   contactForce = "5",
 					   radius = "0.015",
 					   startDensity = "2",

@@ -133,10 +133,10 @@ int main(int argc, char* argv[])
         ros::spinOnce();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
+        // Calibrate force sensor
+        robot.executePrimitive("CaliForceSensor()");
 
-
-            while (ros::ok())
-        {
+        while (ros::ok()){
             if (last_arm_primitive_cmd.data != arm_primitive_cmd.data){
                 std::cout << "I am not equal!!!\n";
                 std::string task_type;
@@ -177,8 +177,7 @@ int main(int argc, char* argv[])
                     }
 
                     // Send command to stop the robot
-                    robot.executePrimitive("Hold()");
-                    std::cout << "I am sending hold!!!\n";
+                    robot.executePrimitive("Stop()");
                 }
                 else if (task_type == "MoveL" | task_type == "MoveJ")
                 {

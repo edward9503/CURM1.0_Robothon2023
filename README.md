@@ -48,13 +48,15 @@ Specifically, we first use the red color to localize the screen region and detec
 warped the screen region into the normal rectangular region. We further segment the relevant color such as red/yellow/cyan 
 and use the triangular fitting to find the peak position. 
 
-## Gripper Hardware Setup
-### Install 
+## Dual Gripper System
+### Software Setup 
 - Install the necessary ros package related to the Arduino/ROS (only neotic is well-tested now)
 ```
 sudo apt-get install ros-${ROS_DISTRO}-rosserial-arduino
 sudo apt-get install ros-${ROS_DISTRO}-rosserial
 ```
 ### Usage
-- Connect the Arduino board with PC and check which port is being used (such as dev/ttyACM0);
+- Connect the Arduino board with PC and check which port is being used (such as /dev/ttyACM0);
 - Run the rosserial node to setup the communication between ROS and Arduino: ```rosrun rosserial_arduino serial_node.py [port_name]```, then the gripper control node is in active;
+- The Arduino subscribe the postion comands of the dual gripper (topic names: [main_gripper_cmd; auxi_gripper_cmd]); Two gripper statuses are also published via topic: [main_gripper_pos_sensor; auxi_gripper_pos_sensor], which are the current gripper positions;
+- In the flexbe behavior tree, use the gripper_control_state for the gripper utility. Note that the topic name inside the state should be the same as previous step.

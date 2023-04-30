@@ -89,6 +89,12 @@ class ArmCartesianControlState(EventState):
 				# else:
 				T = userdata.target_T
 				input_cmd_msg.data = self._arraryCmd_to_string(T_des=T)
+				printT = lambda _T, T_name: Logger.loginfo("{}: x:{} y:{} z:{}, R:{}, P:{}, Y:{}".format(T_name, _T.p.x(),_T.p.y(),_T.p.z(),
+																							np.rad2deg(list(_T.M.GetRPY())[0]),
+																							np.rad2deg(list(_T.M.GetRPY())[1]),
+																							np.rad2deg(list(_T.M.GetRPY())[2]),
+																							))
+				if userdata.is_debug: printT(userdata.target_T, "target_T") 
 					
 				self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 				self._cmd_published = True
