@@ -56,6 +56,7 @@ to the seperate board tasks. The BT is shown in the figure below. We offline des
 In our framework, all the controllers are modularly implemented based on the Flexiv Primitives provided by Flexiv. All the controllers are integrated in a behavior tree manner using ROS. Specificly, tasks that involves target pose reaching are mainly based on the IK of robot arm. Tasks that invloves contacts such as plugging-in are based the force control of Flexiv Primitives.
 
 ## Quick start
+Most task scripts are stacked in the [bash](https://github.com/edward9503/CURM1.0_Robothon2023/tree/main/bash) part. The step-by-step way to start the system is as below:
 First, load the robot description and the controllers:
 ```
 roslaunch flexiv_description flexiv_rviz.launch
@@ -69,11 +70,15 @@ Besides, run the screen perception in another terminal:
 ```
 python vision/src/screen_perception.py
 ```
-Finally, run the task planning and execution, which includes activate the low-level control loop of the robot arms and the dual grippers.
+Then, run the task planning and execution, which includes activate the low-level control loop of the robot arms and the dual grippers.
 ```
 source bash/controller_left.sh
 source bash/controller_right.sh
 rosrun rosserial_arduino serial_node.py [port_name]
+```
+Finally, after configuring the flexbe behavior, the task can be started.
+```
+source bash/flexbe.sh
 ```
 
 
