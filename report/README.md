@@ -58,7 +58,7 @@ In our framework, all the controllers are modularly implemented based on the Fle
 ## Quick start
 Most task scripts are stacked in the [bash](https://github.com/edward9503/CURM1.0_Robothon2023/tree/main/bash) part. The step-by-step way to start the system is as below:
 
-First, load the robot description and the controllers:
+First, load the robot description and visualize the robot (optional):
 ```
 roslaunch flexiv_description flexiv_rviz.launch
 ```
