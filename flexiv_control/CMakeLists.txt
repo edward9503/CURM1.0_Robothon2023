@@ -65,11 +65,34 @@ target_link_libraries(flexiv_control_loop
   ${catkin_LIBRARIES}
 )
 
+add_executable(flexiv_control_loop_contact_mode
+  src/flexiv_control_loop_contact_mode.cpp
+)
+target_include_directories(
+  flexiv_control_loop_contact_mode
+  PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/rdk/include
+  ${catkin_INCLUDE_DIRS}
+)
+target_link_libraries(flexiv_control_loop_contact_mode
+  PRIVATE
+  FlexivRdk
+  ${catkin_LIBRARIES}
+)
+
 # INSTALL
 # Install executable
 install(
   TARGETS
     flexiv_control_loop
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+  TARGETS
+    flexiv_control_loop_contact_mode
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
