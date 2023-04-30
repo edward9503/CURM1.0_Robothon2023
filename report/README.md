@@ -7,7 +7,7 @@ Yunxi Tang, Bin Li
 ## Hardware Setup
 The robot platform on which the Robothon Grand Challange was tested is shown in the figure below.
 <p align="center">
-  <img height="600" src="asserts/robotsetup.png">
+  <img height="480" src="asserts/robotsetup.png">
 </p>
 
 The setup consists of:
@@ -23,7 +23,7 @@ figure below. The vision system first localizes the board by filtering the red r
 i.e, the screen, the red button/port. Besides, the screen is also extracted through color filter and then
 detect the indicator position. Then the sequence of board tasks are executed by the robot.
 <p align="center">
-  <img width="600" src="asserts/system_framework.png">
+  <img height="300" src="asserts/system_framework.png">
 </p>
 
 ### Vision System 
