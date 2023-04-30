@@ -3,6 +3,9 @@
 Authors: Shengzi Wang, Hongbin Lin, 
 Yunxi Tang, Bin Li
 </p>
+<p align="center">
+The Chinese University of Hong Kong
+</p>
 
 ## Hardware Setup
 The robot platform on which the Robothon Grand Challange was tested is shown in the figure below.
@@ -12,9 +15,9 @@ The robot platform on which the Robothon Grand Challange was tested is shown in 
 
 The setup consists of:
 - two 7-Dof Flexiv robot arms mounted on a table. The robots have force sensors in each joint which allows to control the force applied by the end-effector on the environment;
-- two customized two-finger grippers are mounted on the end-effector of the robots. One is used to operate the board tasks and the other one are
- used to hold the rope. Note that the grippers don't have force sensor inside;
-- a vision system consists of an rgbd camera and a rgb camera. Specifically, the RealSense D435i (depth ignored here), and a Daheng imaging device MER-031-860U3C are used to 
+- two customized two-finger grippers are mounted on the end-effector of the robots. One is used to operate the board tasks and the other one is
+ used to manipulate the rope. Note that the grippers don't have force sensor inside;
+- a vision system consists of an rgbd camera and a rgb camera. Specifically, the RealSense D435i (depth ignored here), and a DaHeng imaging device MER-031-860U3C are used to 
 detect the board pose and the indicator in the screen respectively. Note that these two vision perception task are runned separately to ensure the real-time performance;
 
 ## Software Setup
