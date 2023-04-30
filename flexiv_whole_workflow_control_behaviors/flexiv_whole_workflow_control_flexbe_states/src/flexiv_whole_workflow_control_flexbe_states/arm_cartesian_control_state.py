@@ -42,6 +42,7 @@ class ArmCartesianControlState(EventState):
 						offset_Rx=0.0,
 						offset_Ry=0.0,
 						offset_Rz=0.0,
+						maxvel=0.07,
 						blocking=True, 
 						clear=False):
 		super(ArmCartesianControlState, self).__init__(outcomes=['done', 'failed'],
@@ -53,8 +54,10 @@ class ArmCartesianControlState(EventState):
 		self._offset_rot = [offset_Rx, offset_Ry, offset_Rz]
 		self._blocking = blocking
 		self._clear = clear
+		self._maxvel = maxvel
 		self._connected = False
 		self._cmd_published = False
+		
 
 		if not self._connect():
 			Logger.logwarn('Topic %s for state %s not yet available.\n'
@@ -121,7 +124,7 @@ class ArmCartesianControlState(EventState):
 		T = self._ZYX2T(*(self._offset_pos+[0,0,0])) *  T_des *  self._ZYX2T(*([0,0,0]+self._offset_rot))
 		target_zyx_angle = list(T.M.GetEulerZYX())
 		target_position = [T.p.x(), T.p.y(), T.p.z()]
-		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel=0.05)"
+		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel="+str(self._maxvel)+")"
 		return cmd_string
 
 	def _list2str(self, ls):
