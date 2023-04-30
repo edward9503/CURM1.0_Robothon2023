@@ -50,11 +50,10 @@ All the vision code are developed in Python language. The code is available in t
 
 ### Task Planning and execution
 We used the Behavior Tree (BT) to plan and execute the board tasks. The BT is a hierarchical finite state machine that corresponds
-to the seperate board tasks. The BT is shown in the figure below. We offline designed the relative execuating pose collection for each subtasks
-origin to the real-time board pose estimation.
+to the seperate board tasks. The BT is shown in the figure below. We offline designed the relative execuating pose collection for each subtasks origin to the real-time board pose estimation.
 
-### Controllers
-In our framework, all the controllers are modularly implemented based on the primitive control provided by Flexiv. All the controllers are integrated in a behavior tree manner using ROS. Specificly, tasks that involving target pose reaching is mainly based on the IK of robot arm. 
+### Basic Controllers
+In our framework, all the controllers are modularly implemented based on the Flexiv Primitives provided by Flexiv. All the controllers are integrated in a behavior tree manner using ROS. Specificly, tasks that involves target pose reaching are mainly based on the IK of robot arm. Tasks that invloves contacts such as plugging-in are based the force control of Flexiv Primitives.
 
 ## Quick start
 First, load the robot description and the controllers:
@@ -70,9 +69,9 @@ Besides, run the screen perception in another terminal:
 ```
 python vision/src/screen_perception.py
 ```
-Finally, run the task planning and execution:
+Finally, run the task planning and execution, which includes activate the low-level control loop of the robot arms and the dual grippers.
 ```
-XXX (to be implemented)
+rosrun rosserial_arduino rosserial.py [port_name]
 ```
 
 
