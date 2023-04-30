@@ -28,6 +28,7 @@ class ArmCartesianControlState(EventState):
     -- offset_Rx 							float		offset x axis angle w.r.t. robot base in ZYX represntation
 	-- offset_Ry 							float		offset y axis angle w.r.t. robot base in ZYX represntation
 	-- offset_Rz 							float		offset z axis angle w.r.t. robot base in ZYX represntation
+	-- offset_reference                     string      local or wolrd
     -- blocking 							bool 		Blocks until a message is received.
     -- clear 								bool 		Drops last message on this topic on enter
                     						            in order to only handle message received since this state is active.
@@ -42,6 +43,7 @@ class ArmCartesianControlState(EventState):
 						offset_Rx=0.0,
 						offset_Ry=0.0,
 						offset_Rz=0.0,
+						offset_reference="local",
 						maxvel=0.07,
 						blocking=True, 
 						clear=False):
@@ -52,6 +54,7 @@ class ArmCartesianControlState(EventState):
 		self._pub = ProxyPublisher({self._arm_cmd_topic: String})
 		self._offset_pos = [offset_x, offset_y, offset_z]
 		self._offset_rot = [offset_Rx, offset_Ry, offset_Rz]
+		self._offset_reference = offset_reference
 		self._blocking = blocking
 		self._clear = clear
 		self._maxvel = maxvel
@@ -121,7 +124,12 @@ class ArmCartesianControlState(EventState):
 		return False
 	
 	def _arraryCmd_to_string(self, T_des):
-		T = self._ZYX2T(*(self._offset_pos+[0,0,0])) *  T_des *  self._ZYX2T(*([0,0,0]+self._offset_rot))
+		if self._offset_reference == "local":
+			T = T_des *  self._ZYX2T(*(self._offset_rot+self._offset_rot))
+		elif self._offset_reference == "local":
+			T = self._ZYX2T(*(self._offset_rot+self._offset_rot)) * T_des 
+		else:
+			raise NotImplementedError
 		target_zyx_angle = list(T.M.GetEulerZYX())
 		target_position = [T.p.x(), T.p.y(), T.p.z()]
 		cmd_string = "MoveL(target=" + self._list2str(target_position) + self._list2str(target_zyx_angle) + "WORLD WORLD_ORIGIN, maxVel="+str(self._maxvel)+")"

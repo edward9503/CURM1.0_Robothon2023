@@ -80,7 +80,8 @@ class ContactCalibration(EventState):
 		self._connect()
 		sleep(1.0)
 		input_cmd_msg = String()
-		input_cmd_msg.data = "AlignContact(contactDir="+self._contactDir+",freeSpaceVel="+self._freeSpaceVel+")"
+		input_cmd_msg.data = "AlignContact(contactDir="+self._contactDir+",freeSpaceVel="+str(self._freeSpaceVel)+")"
+		input_cmd_msg.data = "AlignContact(contactDir=0 1 0,freeSpaceVel=0.02)"
 		self._pub.publish(self._arm_cmd_topic, input_cmd_msg)
 
 		
